@@ -1,22 +1,22 @@
-import { createFileRoute } from "@tanstack/react-router"
-import { useInterwovenKit } from "@initia/interwovenkit-react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { useAccount } from "@/queries/useAccount"
+import { createFileRoute } from "@tanstack/react-router";
+import { useInterwovenKit } from "@initia/interwovenkit-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useAccount } from "@/queries/useAccount";
 
 export const Route = createFileRoute("/_protected/dashboard")({
   component: DashboardPage,
-})
+});
 
 function DashboardPage() {
-  const { initiaAddress } = useInterwovenKit()
-  const { data: account, isLoading } = useAccount(initiaAddress)
+  const { initiaAddress } = useInterwovenKit();
+  const { data: account, isLoading } = useAccount(initiaAddress);
 
   if (isLoading || !account) {
     return (
       <div className="flex min-h-svh items-center justify-center">
         <p className="text-slate-500">Loading...</p>
       </div>
-    )
+    );
   }
 
   return (
@@ -106,5 +106,5 @@ function DashboardPage() {
         </CardContent>
       </Card>
     </>
-  )
+  );
 }

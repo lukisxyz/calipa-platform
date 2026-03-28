@@ -1,17 +1,17 @@
-"use client"
+"use client";
 
-import { ClientOnly, createFileRoute } from "@tanstack/react-router"
-import { useInterwovenKit } from "@initia/interwovenkit-react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { Label } from "@/components/ui/label"
-import { useForm } from "@tanstack/react-form"
-import { useNavigate } from "@tanstack/react-router"
-import { useEffect, useState } from "react"
-import * as v from "valibot"
-import { TimezoneSelect } from "@/components/ui/timezone-select"
-import { useAccountExists, useCreateAccount } from "@/queries/useAccount"
+import { ClientOnly, createFileRoute } from "@tanstack/react-router";
+import { useInterwovenKit } from "@initia/interwovenkit-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { useForm } from "@tanstack/react-form";
+import { useNavigate } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
+import * as v from "valibot";
+import { TimezoneSelect } from "@/components/ui/timezone-select";
+import { useAccountExists, useCreateAccount } from "@/queries/useAccount";
 
 const accountSchema = v.object({
   username: v.pipe(
@@ -31,7 +31,7 @@ const accountSchema = v.object({
   email: v.pipe(v.string(), v.email("Invalid email address")),
   timezone: v.pipe(v.string(), v.minLength(1, "Timezone is required")),
   bio: v.optional(v.string()),
-})
+});
 
 function GrainyBackground() {
   return (
@@ -50,21 +50,21 @@ function GrainyBackground() {
         <rect width="100%" height="100%" filter="url(#sandFilter)" />
       </svg>
     </div>
-  )
+  );
 }
 
 function CreateAccountContent() {
-  const { initiaAddress } = useInterwovenKit()
-  const navigate = useNavigate()
-  const createAccount = useCreateAccount()
-  const { data: exists } = useAccountExists(initiaAddress)
-  const [error, setError] = useState<string | null>(null)
+  const { initiaAddress } = useInterwovenKit();
+  const navigate = useNavigate();
+  const createAccount = useCreateAccount();
+  const { data: exists } = useAccountExists(initiaAddress);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (exists) {
-      navigate({ to: "/dashboard", viewTransition: true })
+      navigate({ to: "/dashboard", viewTransition: true });
     }
-  }, [exists, navigate])
+  }, [exists, navigate]);
 
   const form = useForm({
     defaultValues: {
@@ -76,17 +76,17 @@ function CreateAccountContent() {
     },
     onSubmit: async ({ value }) => {
       if (!initiaAddress) {
-        setError("Wallet not connected")
-        return
+        setError("Wallet not connected");
+        return;
       }
 
-      const result = v.safeParse(accountSchema, value)
+      const result = v.safeParse(accountSchema, value);
       if (!result.success) {
-        setError(result.issues[0]?.message || "Validation failed")
-        return
+        setError(result.issues[0]?.message || "Validation failed");
+        return;
       }
 
-      setError(null)
+      setError(null);
 
       try {
         await createAccount.mutateAsync({
@@ -96,14 +96,14 @@ function CreateAccountContent() {
           email: value.email,
           timezone: value.timezone,
           bio: value.bio || "",
-        })
+        });
 
-        navigate({ to: "/dashboard", viewTransition: true })
+        navigate({ to: "/dashboard", viewTransition: true });
       } catch (e: unknown) {
-        setError(e instanceof Error ? e.message : "Failed to create account")
+        setError(e instanceof Error ? e.message : "Failed to create account");
       }
     },
-  })
+  });
 
   if (!initiaAddress) {
     return (
@@ -120,7 +120,7 @@ function CreateAccountContent() {
           </div>
         </main>
       </>
-    )
+    );
   }
 
   return (
@@ -140,8 +140,8 @@ function CreateAccountContent() {
           <div className="rounded-xl border border-border bg-white p-6 shadow-sm">
             <form
               onSubmit={(e) => {
-                e.preventDefault()
-                form.handleSubmit()
+                e.preventDefault();
+                form.handleSubmit();
               }}
               className="space-y-4"
             >
@@ -263,12 +263,12 @@ function CreateAccountContent() {
         </div>
       </main>
     </>
-  )
+  );
 }
 
 export const Route = createFileRoute("/create-account")({
   component: CreateAccountPage,
-})
+});
 
 function CreateAccountPage() {
   return (
@@ -281,5 +281,5 @@ function CreateAccountPage() {
     >
       <CreateAccountContent />
     </ClientOnly>
-  )
+  );
 }

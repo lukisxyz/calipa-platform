@@ -1,8 +1,8 @@
-import { createServerFn } from "@tanstack/react-start"
-import { db } from "@/lib/db"
-import { accounts } from "@/lib/db/schema"
-import { eq } from "drizzle-orm"
-import type { Account, AccountInput } from "@/lib/db/schema"
+import { createServerFn } from "@tanstack/react-start";
+import { db } from "@/lib/db";
+import { accounts } from "@/lib/db/schema";
+import { eq } from "drizzle-orm";
+import type { Account, AccountInput } from "@/lib/db/schema";
 
 export const getAccount = createServerFn({ method: "GET" })
   .inputValidator((data: { walletAddress: string }) => data)
@@ -11,14 +11,14 @@ export const getAccount = createServerFn({ method: "GET" })
       .select()
       .from(accounts)
       .where(eq(accounts.walletAddress, data.walletAddress))
-      .get()
+      .get();
 
     if (!account) {
-      throw new Error("Account not found")
+      throw new Error("Account not found");
     }
 
-    return account as Account
-  })
+    return account as Account;
+  });
 
 export const accountExists = createServerFn({ method: "GET" })
   .inputValidator((data: { walletAddress: string }) => data)
@@ -27,10 +27,10 @@ export const accountExists = createServerFn({ method: "GET" })
       .select()
       .from(accounts)
       .where(eq(accounts.walletAddress, data.walletAddress))
-      .get()
+      .get();
 
-    return !!account
-  })
+    return !!account;
+  });
 
 export const getAccountByUsername = createServerFn({ method: "GET" })
   .inputValidator((data: { username: string }) => data)
@@ -39,10 +39,10 @@ export const getAccountByUsername = createServerFn({ method: "GET" })
       .select()
       .from(accounts)
       .where(eq(accounts.username, data.username))
-      .get()
+      .get();
 
-    return account as Account | null
-  })
+    return account as Account | null;
+  });
 
 export const createAccount = createServerFn({ method: "POST" })
   .inputValidator((data: AccountInput) => data)
@@ -51,23 +51,23 @@ export const createAccount = createServerFn({ method: "POST" })
       .select()
       .from(accounts)
       .where(eq(accounts.walletAddress, data.walletAddress))
-      .get()
+      .get();
 
     if (existing) {
-      throw new Error("Account already exists")
+      throw new Error("Account already exists");
     }
 
     const usernameExists = await db
       .select()
       .from(accounts)
       .where(eq(accounts.username, data.username))
-      .get()
+      .get();
 
     if (usernameExists) {
-      throw new Error("Username already taken")
+      throw new Error("Username already taken");
     }
 
-    const now = new Date()
+    const now = new Date();
     const result = await db
       .insert(accounts)
       .values({
@@ -75,7 +75,7 @@ export const createAccount = createServerFn({ method: "POST" })
         createdAt: now,
         updatedAt: now,
       })
-      .returning()
+      .returning();
 
-    return result[0] as Account
-  })
+    return result[0] as Account;
+  });

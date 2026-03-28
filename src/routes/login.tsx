@@ -1,15 +1,15 @@
-"use client"
+"use client";
 
-import { ClientOnly, createFileRoute } from "@tanstack/react-router"
-import { useInterwovenKit } from "@initia/interwovenkit-react"
-import { Button } from "@/components/ui/button"
-import { useEffect } from "react"
-import { useNavigate } from "@tanstack/react-router"
-import { useAccountExists } from "@/queries/useAccount"
+import { ClientOnly, createFileRoute } from "@tanstack/react-router";
+import { useInterwovenKit } from "@initia/interwovenkit-react";
+import { Button } from "@/components/ui/button";
+import { useEffect } from "react";
+import { useNavigate } from "@tanstack/react-router";
+import { useAccountExists } from "@/queries/useAccount";
 
 function shortenAddress(value: string) {
-  if (value.length < 14) return value
-  return `${value.slice(0, 8)}...${value.slice(-4)}`
+  if (value.length < 14) return value;
+  return `${value.slice(0, 8)}...${value.slice(-4)}`;
 }
 
 function GrainyBackground() {
@@ -29,31 +29,31 @@ function GrainyBackground() {
         <rect width="100%" height="100%" filter="url(#sandFilter)" />
       </svg>
     </div>
-  )
+  );
 }
 
 function LoginContent() {
-  const { initiaAddress, openConnect, openWallet } = useInterwovenKit()
-  const navigate = useNavigate()
-  const { data: exists, isLoading } = useAccountExists(initiaAddress)
+  const { initiaAddress, openConnect, openWallet } = useInterwovenKit();
+  const navigate = useNavigate();
+  const { data: exists, isLoading } = useAccountExists(initiaAddress);
 
   useEffect(() => {
-    if (isLoading) return
+    if (isLoading) return;
 
     if (exists) {
-      navigate({ to: "/dashboard", viewTransition: true })
+      navigate({ to: "/dashboard", viewTransition: true });
     } else if (initiaAddress) {
-      navigate({ to: "/create-account", viewTransition: true })
+      navigate({ to: "/create-account", viewTransition: true });
     }
-  }, [exists, initiaAddress, isLoading, navigate])
+  }, [exists, initiaAddress, isLoading, navigate]);
 
   const handleConnect = () => {
-    openConnect()
-  }
+    openConnect();
+  };
 
   const handleDisconnect = () => {
-    openWallet()
-  }
+    openWallet();
+  };
 
   return (
     <>
@@ -179,12 +179,12 @@ function LoginContent() {
         </div>
       </main>
     </>
-  )
+  );
 }
 
 export const Route = createFileRoute("/login")({
   component: LoginPage,
-})
+});
 
 function LoginPage() {
   return (
@@ -197,5 +197,5 @@ function LoginPage() {
     >
       <LoginContent />
     </ClientOnly>
-  )
+  );
 }

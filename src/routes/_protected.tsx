@@ -1,23 +1,23 @@
-"use client"
+"use client";
 
 import {
   Link,
   Outlet,
   createFileRoute,
   useNavigate,
-} from "@tanstack/react-router"
-import { useInterwovenKit } from "@initia/interwovenkit-react"
-import { ClientOnly } from "@tanstack/react-router"
-import { Button } from "@/components/ui/button"
-import { useEffect } from "react"
+} from "@tanstack/react-router";
+import { useInterwovenKit } from "@initia/interwovenkit-react";
+import { ClientOnly } from "@tanstack/react-router";
+import { Button } from "@/components/ui/button";
+import { useEffect } from "react";
 
 function shortenAddress(value: string) {
-  if (value.length < 14) return value
-  return `${value.slice(0, 8)}...${value.slice(-4)}`.toUpperCase()
+  if (value.length < 14) return value;
+  return `${value.slice(0, 8)}...${value.slice(-4)}`.toUpperCase();
 }
 
 function Header() {
-  const { initiaAddress, openWallet } = useInterwovenKit()
+  const { initiaAddress, openWallet } = useInterwovenKit();
 
   return (
     <header className="sticky top-0 z-50 border-b border-slate-200 bg-white">
@@ -36,21 +36,21 @@ function Header() {
         </div>
       </div>
     </header>
-  )
+  );
 }
 
 function ProtectedContent() {
-  const { initiaAddress } = useInterwovenKit()
-  const navigate = useNavigate()
+  const { initiaAddress } = useInterwovenKit();
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (!initiaAddress) {
-      navigate({ to: "/login" })
+      navigate({ to: "/login" });
     }
-  }, [initiaAddress, navigate])
+  }, [initiaAddress, navigate]);
 
   if (!initiaAddress) {
-    return null
+    return null;
   }
 
   return (
@@ -60,12 +60,12 @@ function ProtectedContent() {
         <Outlet />
       </main>
     </>
-  )
+  );
 }
 
 export const Route = createFileRoute("/_protected")({
   component: ProtectedPage,
-})
+});
 
 function ProtectedPage() {
   return (
@@ -78,5 +78,5 @@ function ProtectedPage() {
     >
       <ProtectedContent />
     </ClientOnly>
-  )
+  );
 }

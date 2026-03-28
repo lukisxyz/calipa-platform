@@ -1,7 +1,7 @@
-import { createFileRoute, Link } from "@tanstack/react-router"
-import { Button } from "@/components/ui/button"
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { Button } from "@/components/ui/button";
 
-export const Route = createFileRoute("/")({ component: Home })
+export const Route = createFileRoute("/")({ component: Home });
 
 function GrainyBackground() {
   return (
@@ -20,7 +20,7 @@ function GrainyBackground() {
         <rect width="100%" height="100%" filter="url(#sandFilter)" />
       </svg>
     </div>
-  )
+  );
 }
 
 function Home() {
@@ -150,5 +150,5 @@ function Home() {
         </div>
       </section>
     </>
-  )
+  );
 }

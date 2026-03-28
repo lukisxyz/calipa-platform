@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import { GlobeIcon } from "lucide-react"
+import { GlobeIcon } from "lucide-react";
 
 import {
   Combobox,
@@ -12,8 +12,8 @@ import {
   ComboboxItem,
   ComboboxLabel,
   ComboboxList,
-} from "@/components/ui/combobox"
-import { InputGroupAddon } from "@/components/ui/input-group"
+} from "@/components/ui/combobox";
+import { InputGroupAddon } from "@/components/ui/input-group";
 
 const timezones = [
   {
@@ -131,13 +131,13 @@ const timezones = [
       { label: "(GMT+12) Fiji", value: "Pacific/Fiji" },
     ],
   },
-] as const
+] as const;
 
 interface TimezoneSelectProps {
-  value?: string
-  onChange?: (value: string) => void
-  placeholder?: string
-  className?: string
+  value?: string;
+  onChange?: (value: string) => void;
+  placeholder?: string;
+  className?: string;
 }
 
 export function TimezoneSelect({
@@ -178,5 +178,5 @@ export function TimezoneSelect({
         </ComboboxList>
       </ComboboxContent>
     </Combobox>
-  )
+  );
 }

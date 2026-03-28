@@ -3,12 +3,12 @@ import {
   Outlet,
   Scripts,
   createRootRoute,
-} from "@tanstack/react-router"
-import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools"
-import { TanStackDevtools } from "@tanstack/react-devtools"
+} from "@tanstack/react-router";
+import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
+import { TanStackDevtools } from "@tanstack/react-devtools";
 
-import appCss from "../styles.css?url"
-import { Providers } from "../providers"
+import appCss from "../styles.css?url";
+import { Providers } from "../providers";
 
 export const Route = createRootRoute({
   head: () => ({
@@ -96,7 +96,7 @@ export const Route = createRootRoute({
     ],
   }),
   component: RootDocument,
-})
+});
 
 function RootDocument() {
   return (
@@ -122,5 +122,5 @@ function RootDocument() {
         <Scripts />
       </body>
     </html>
-  )
+  );
 }
