@@ -5,6 +5,6 @@ export default defineConfig({
   out: "./drizzle",
   dialect: "sqlite",
   dbCredentials: {
-    url: "calipa.db",
+    url: process.env.TURSO_DATABASE_URL || "calipa.db",
   },
 })
