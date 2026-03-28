@@ -7,7 +7,6 @@ import {
 import { WagmiProvider, createConfig, http } from "wagmi"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { mainnet } from "wagmi/chains"
-import interwovenKitStyles from "@initia/interwovenkit-react/styles.js"
 
 const queryClient = new QueryClient()
 
@@ -18,9 +17,11 @@ const wagmiConfig = createConfig({
 
 export function Providers({ children }: { children: React.ReactNode }) {
   useEffect(() => {
-    // Inject styles into the shadow DOM used by Initia Wallet
-    injectStyles(interwovenKitStyles)
+    import("@initia/interwovenkit-react/styles.js").then((styles) => {
+      injectStyles(styles.default)
+    })
   }, [])
+
   return (
     <WagmiProvider config={wagmiConfig}>
       <QueryClientProvider client={queryClient}>

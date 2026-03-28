@@ -41,7 +41,7 @@ function Home() {
           </p>
 
           <div className="mt-8 sm:mt-10">
-            <Link to="/login">
+            <Link to="/login" viewTransition>
               <Button
                 size="lg"
                 className="px-6 py-5 text-base font-semibold rounded-full sm:px-8 sm:py-6 sm:text-lg"
