@@ -10,22 +10,8 @@ import { useForm } from "@tanstack/react-form"
 import { useNavigate } from "@tanstack/react-router"
 import { useEffect, useState } from "react"
 import * as v from "valibot"
-
-const getStoredAccount = (address: string) => {
-  if (typeof window === "undefined") return null
-  const accounts = localStorage.getItem("calipa_accounts")
-  if (!accounts) return null
-  const parsed = JSON.parse(accounts)
-  return parsed[address] || null
-}
-
-const saveAccount = (address: string, data: any) => {
-  if (typeof window === "undefined") return
-  const accounts = localStorage.getItem("calipa_accounts")
-  const parsed = accounts ? JSON.parse(accounts) : {}
-  parsed[address] = data
-  localStorage.setItem("calipa_accounts", JSON.stringify(parsed))
-}
+import { TimezoneSelect } from "@/components/ui/timezone-select"
+import { useAccountExists, useCreateAccount } from "@/queries/useAccount"
 
 const accountSchema = v.object({
   username: v.pipe(
@@ -43,6 +29,7 @@ const accountSchema = v.object({
     v.maxLength(100, "Name must be at most 100 characters")
   ),
   email: v.pipe(v.string(), v.email("Invalid email address")),
+  timezone: v.pipe(v.string(), v.minLength(1, "Timezone is required")),
   bio: v.optional(v.string()),
 })
 
@@ -69,23 +56,22 @@ function GrainyBackground() {
 function CreateAccountContent() {
   const { initiaAddress } = useInterwovenKit()
   const navigate = useNavigate()
-  const [submitting, setSubmitting] = useState(false)
+  const createAccount = useCreateAccount()
+  const { data: exists } = useAccountExists(initiaAddress)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    if (initiaAddress) {
-      const account = getStoredAccount(initiaAddress)
-      if (account) {
-        navigate({ to: "/dashboard", viewTransition: true })
-      }
+    if (exists) {
+      navigate({ to: "/dashboard", viewTransition: true })
     }
-  }, [initiaAddress, navigate])
+  }, [exists, navigate])
 
   const form = useForm({
     defaultValues: {
       username: "",
       name: "",
       email: "",
+      timezone: "",
       bio: "",
     },
     onSubmit: async ({ value }) => {
@@ -100,36 +86,21 @@ function CreateAccountContent() {
         return
       }
 
-      const accounts = localStorage.getItem("calipa_accounts")
-      if (accounts) {
-        const parsed = JSON.parse(accounts)
-        const existing = Object.values(parsed).find(
-          (a: any) => a.username === value.username
-        )
-        if (existing) {
-          setError("Username already taken")
-          return
-        }
-      }
-
-      setSubmitting(true)
       setError(null)
 
       try {
-        saveAccount(initiaAddress, {
+        await createAccount.mutateAsync({
           walletAddress: initiaAddress,
           username: value.username,
           name: value.name,
           email: value.email,
+          timezone: value.timezone,
           bio: value.bio || "",
-          createdAt: new Date().toISOString(),
         })
 
         navigate({ to: "/dashboard", viewTransition: true })
       } catch (e: unknown) {
         setError(e instanceof Error ? e.message : "Failed to create account")
-      } finally {
-        setSubmitting(false)
       }
     },
   })
@@ -242,6 +213,25 @@ function CreateAccountContent() {
               />
 
               <form.Field
+                name="timezone"
+                children={(field) => (
+                  <div className="space-y-2">
+                    <Label htmlFor={field.name}>Timezone</Label>
+                    <TimezoneSelect
+                      value={field.state.value}
+                      onChange={(value) => field.handleChange(value)}
+                      placeholder="Select your timezone"
+                    />
+                    {field.state.meta.errors && (
+                      <p className="text-xs text-red-500">
+                        {field.state.meta.errors[0]}
+                      </p>
+                    )}
+                  </div>
+                )}
+              />
+
+              <form.Field
                 name="bio"
                 children={(field) => (
                   <div className="space-y-2">
@@ -264,9 +254,9 @@ function CreateAccountContent() {
               <Button
                 type="submit"
                 className="w-full py-6 text-base font-semibold"
-                disabled={submitting}
+                disabled={createAccount.isPending}
               >
-                {submitting ? "Creating..." : "Create Account"}
+                {createAccount.isPending ? "Creating..." : "Create Account"}
               </Button>
             </form>
           </div>

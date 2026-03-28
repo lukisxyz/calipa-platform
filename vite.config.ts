@@ -25,7 +25,6 @@ const config = defineConfig({
   },
   define: {
     global: "globalThis",
-    "process.env": {},
   },
   optimizeDeps: {
     include: ["buffer", "process"],

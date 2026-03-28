@@ -5,14 +5,7 @@ import { useInterwovenKit } from "@initia/interwovenkit-react"
 import { Button } from "@/components/ui/button"
 import { useEffect } from "react"
 import { useNavigate } from "@tanstack/react-router"
-
-const getStoredAccount = (address: string) => {
-  if (typeof window === "undefined") return null
-  const accounts = localStorage.getItem("calipa_accounts")
-  if (!accounts) return null
-  const parsed = JSON.parse(accounts)
-  return parsed[address] || null
-}
+import { useAccountExists } from "@/queries/useAccount"
 
 function shortenAddress(value: string) {
   if (value.length < 14) return value
@@ -42,21 +35,17 @@ function GrainyBackground() {
 function LoginContent() {
   const { initiaAddress, openConnect, openWallet } = useInterwovenKit()
   const navigate = useNavigate()
+  const { data: exists, isLoading } = useAccountExists(initiaAddress)
 
   useEffect(() => {
-    if (!initiaAddress) return
+    if (isLoading) return
 
-    const checkAccount = () => {
-      const account = getStoredAccount(initiaAddress)
-      if (account) {
-        navigate({ to: "/dashboard", viewTransition: true })
-      } else {
-        navigate({ to: "/create-account", viewTransition: true })
-      }
+    if (exists) {
+      navigate({ to: "/dashboard", viewTransition: true })
+    } else if (initiaAddress) {
+      navigate({ to: "/create-account", viewTransition: true })
     }
-
-    checkAccount()
-  }, [initiaAddress, navigate])
+  }, [exists, initiaAddress, isLoading, navigate])
 
   const handleConnect = () => {
     openConnect()
