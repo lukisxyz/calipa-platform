@@ -46,7 +46,7 @@ export function DashboardSidebar() {
 
   return (
     <aside className="flex h-full w-64 flex-col border-r border-slate-200 bg-white py-3.5">
-      <div className="px-4 pb-3.5 border-b">
+      <div className="px-4 pb-3.5">
         <Link to="/" viewTransition className="flex items-center gap-2 px-2">
           <img src="/favicon-32x32.png" alt="Calipa" className="size-6" />
           <span className="text-xl font-black text-slate-800">Calipa</span>
