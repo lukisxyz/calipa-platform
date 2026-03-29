@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { useNavigate } from "@tanstack/react-router";
 import { useAccountExists } from "@/queries/useAccount";
 import { shortenAddress } from "@/lib/helpers";
+import { Wallet, Clock, Calendar } from "lucide-react";
 
 function GrainyBackground() {
   return (
@@ -67,19 +68,7 @@ function LoginContent() {
               <div className="rounded-lg bg-slate-50 p-4">
                 <div className="flex items-center gap-3">
                   <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
-                    <svg
-                      className="w-5 h-5 text-blue-600"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"
-                      />
-                    </svg>
+                    <Wallet className="w-5 h-5 text-blue-600" />
                   </div>
                   <div>
                     <p className="text-sm font-medium text-slate-900">
@@ -95,19 +84,7 @@ function LoginContent() {
               <div className="rounded-lg bg-slate-50 p-4">
                 <div className="flex items-center gap-3">
                   <div className="h-10 w-10 rounded-full bg-green-100 flex items-center justify-center">
-                    <svg
-                      className="w-5 h-5 text-green-600"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                      />
-                    </svg>
+                    <Clock className="w-5 h-5 text-green-600" />
                   </div>
                   <div>
                     <p className="text-sm font-medium text-slate-900">
@@ -121,19 +98,7 @@ function LoginContent() {
               <div className="rounded-lg bg-slate-50 p-4">
                 <div className="flex items-center gap-3">
                   <div className="h-10 w-10 rounded-full bg-purple-100 flex items-center justify-center">
-                    <svg
-                      className="w-5 h-5 text-purple-600"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                      />
-                    </svg>
+                    <Calendar className="w-5 h-5 text-purple-600" />
                   </div>
                   <div>
                     <p className="text-sm font-medium text-slate-900">

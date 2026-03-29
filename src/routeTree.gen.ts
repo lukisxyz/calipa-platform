@@ -16,8 +16,12 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as ProtectedWorkflowsRouteImport } from './routes/_protected/workflows'
 import { Route as ProtectedRoutingRouteImport } from './routes/_protected/routing'
 import { Route as ProtectedInsightRouteImport } from './routes/_protected/insight'
-import { Route as ProtectedEventTypesRouteImport } from './routes/_protected/event-types'
 import { Route as ProtectedBookingsRouteImport } from './routes/_protected/bookings'
+import { Route as ProtectedEventTypesIndexRouteImport } from './routes/_protected/event-types/index'
+import { Route as EUsernameSlugRouteImport } from './routes/e.$username.$slug'
+import { Route as ProtectedEventTypesCreateRouteImport } from './routes/_protected/event-types/create'
+import { Route as ProtectedEventTypesEventTypeIdIndexRouteImport } from './routes/_protected/event-types/$eventTypeId/index'
+import { Route as ProtectedEventTypesEventTypeIdEditRouteImport } from './routes/_protected/event-types/$eventTypeId/edit'
 
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
@@ -53,36 +57,68 @@ const ProtectedInsightRoute = ProtectedInsightRouteImport.update({
   path: '/insight',
   getParentRoute: () => ProtectedRoute,
 } as any)
-const ProtectedEventTypesRoute = ProtectedEventTypesRouteImport.update({
-  id: '/event-types',
-  path: '/event-types',
-  getParentRoute: () => ProtectedRoute,
-} as any)
 const ProtectedBookingsRoute = ProtectedBookingsRouteImport.update({
   id: '/bookings',
   path: '/bookings',
   getParentRoute: () => ProtectedRoute,
 } as any)
+const ProtectedEventTypesIndexRoute =
+  ProtectedEventTypesIndexRouteImport.update({
+    id: '/event-types/',
+    path: '/event-types/',
+    getParentRoute: () => ProtectedRoute,
+  } as any)
+const EUsernameSlugRoute = EUsernameSlugRouteImport.update({
+  id: '/e/$username/$slug',
+  path: '/e/$username/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProtectedEventTypesCreateRoute =
+  ProtectedEventTypesCreateRouteImport.update({
+    id: '/event-types/create',
+    path: '/event-types/create',
+    getParentRoute: () => ProtectedRoute,
+  } as any)
+const ProtectedEventTypesEventTypeIdIndexRoute =
+  ProtectedEventTypesEventTypeIdIndexRouteImport.update({
+    id: '/event-types/$eventTypeId/',
+    path: '/event-types/$eventTypeId/',
+    getParentRoute: () => ProtectedRoute,
+  } as any)
+const ProtectedEventTypesEventTypeIdEditRoute =
+  ProtectedEventTypesEventTypeIdEditRouteImport.update({
+    id: '/event-types/$eventTypeId/edit',
+    path: '/event-types/$eventTypeId/edit',
+    getParentRoute: () => ProtectedRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/create-account': typeof CreateAccountRoute
   '/login': typeof LoginRoute
   '/bookings': typeof ProtectedBookingsRoute
-  '/event-types': typeof ProtectedEventTypesRoute
   '/insight': typeof ProtectedInsightRoute
   '/routing': typeof ProtectedRoutingRoute
   '/workflows': typeof ProtectedWorkflowsRoute
+  '/event-types/create': typeof ProtectedEventTypesCreateRoute
+  '/e/$username/$slug': typeof EUsernameSlugRoute
+  '/event-types/': typeof ProtectedEventTypesIndexRoute
+  '/event-types/$eventTypeId/edit': typeof ProtectedEventTypesEventTypeIdEditRoute
+  '/event-types/$eventTypeId/': typeof ProtectedEventTypesEventTypeIdIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/create-account': typeof CreateAccountRoute
   '/login': typeof LoginRoute
   '/bookings': typeof ProtectedBookingsRoute
-  '/event-types': typeof ProtectedEventTypesRoute
   '/insight': typeof ProtectedInsightRoute
   '/routing': typeof ProtectedRoutingRoute
   '/workflows': typeof ProtectedWorkflowsRoute
+  '/event-types/create': typeof ProtectedEventTypesCreateRoute
+  '/e/$username/$slug': typeof EUsernameSlugRoute
+  '/event-types': typeof ProtectedEventTypesIndexRoute
+  '/event-types/$eventTypeId/edit': typeof ProtectedEventTypesEventTypeIdEditRoute
+  '/event-types/$eventTypeId': typeof ProtectedEventTypesEventTypeIdIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -91,10 +127,14 @@ export interface FileRoutesById {
   '/create-account': typeof CreateAccountRoute
   '/login': typeof LoginRoute
   '/_protected/bookings': typeof ProtectedBookingsRoute
-  '/_protected/event-types': typeof ProtectedEventTypesRoute
   '/_protected/insight': typeof ProtectedInsightRoute
   '/_protected/routing': typeof ProtectedRoutingRoute
   '/_protected/workflows': typeof ProtectedWorkflowsRoute
+  '/_protected/event-types/create': typeof ProtectedEventTypesCreateRoute
+  '/e/$username/$slug': typeof EUsernameSlugRoute
+  '/_protected/event-types/': typeof ProtectedEventTypesIndexRoute
+  '/_protected/event-types/$eventTypeId/edit': typeof ProtectedEventTypesEventTypeIdEditRoute
+  '/_protected/event-types/$eventTypeId/': typeof ProtectedEventTypesEventTypeIdIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -103,20 +143,28 @@ export interface FileRouteTypes {
     | '/create-account'
     | '/login'
     | '/bookings'
-    | '/event-types'
     | '/insight'
     | '/routing'
     | '/workflows'
+    | '/event-types/create'
+    | '/e/$username/$slug'
+    | '/event-types/'
+    | '/event-types/$eventTypeId/edit'
+    | '/event-types/$eventTypeId/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/create-account'
     | '/login'
     | '/bookings'
-    | '/event-types'
     | '/insight'
     | '/routing'
     | '/workflows'
+    | '/event-types/create'
+    | '/e/$username/$slug'
+    | '/event-types'
+    | '/event-types/$eventTypeId/edit'
+    | '/event-types/$eventTypeId'
   id:
     | '__root__'
     | '/'
@@ -124,10 +172,14 @@ export interface FileRouteTypes {
     | '/create-account'
     | '/login'
     | '/_protected/bookings'
-    | '/_protected/event-types'
     | '/_protected/insight'
     | '/_protected/routing'
     | '/_protected/workflows'
+    | '/_protected/event-types/create'
+    | '/e/$username/$slug'
+    | '/_protected/event-types/'
+    | '/_protected/event-types/$eventTypeId/edit'
+    | '/_protected/event-types/$eventTypeId/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -135,6 +187,7 @@ export interface RootRouteChildren {
   ProtectedRoute: typeof ProtectedRouteWithChildren
   CreateAccountRoute: typeof CreateAccountRoute
   LoginRoute: typeof LoginRoute
+  EUsernameSlugRoute: typeof EUsernameSlugRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -188,13 +241,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProtectedInsightRouteImport
       parentRoute: typeof ProtectedRoute
     }
-    '/_protected/event-types': {
-      id: '/_protected/event-types'
-      path: '/event-types'
-      fullPath: '/event-types'
-      preLoaderRoute: typeof ProtectedEventTypesRouteImport
-      parentRoute: typeof ProtectedRoute
-    }
     '/_protected/bookings': {
       id: '/_protected/bookings'
       path: '/bookings'
@@ -202,23 +248,66 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProtectedBookingsRouteImport
       parentRoute: typeof ProtectedRoute
     }
+    '/_protected/event-types/': {
+      id: '/_protected/event-types/'
+      path: '/event-types'
+      fullPath: '/event-types/'
+      preLoaderRoute: typeof ProtectedEventTypesIndexRouteImport
+      parentRoute: typeof ProtectedRoute
+    }
+    '/e/$username/$slug': {
+      id: '/e/$username/$slug'
+      path: '/e/$username/$slug'
+      fullPath: '/e/$username/$slug'
+      preLoaderRoute: typeof EUsernameSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_protected/event-types/create': {
+      id: '/_protected/event-types/create'
+      path: '/event-types/create'
+      fullPath: '/event-types/create'
+      preLoaderRoute: typeof ProtectedEventTypesCreateRouteImport
+      parentRoute: typeof ProtectedRoute
+    }
+    '/_protected/event-types/$eventTypeId/': {
+      id: '/_protected/event-types/$eventTypeId/'
+      path: '/event-types/$eventTypeId'
+      fullPath: '/event-types/$eventTypeId/'
+      preLoaderRoute: typeof ProtectedEventTypesEventTypeIdIndexRouteImport
+      parentRoute: typeof ProtectedRoute
+    }
+    '/_protected/event-types/$eventTypeId/edit': {
+      id: '/_protected/event-types/$eventTypeId/edit'
+      path: '/event-types/$eventTypeId/edit'
+      fullPath: '/event-types/$eventTypeId/edit'
+      preLoaderRoute: typeof ProtectedEventTypesEventTypeIdEditRouteImport
+      parentRoute: typeof ProtectedRoute
+    }
   }
 }
 
 interface ProtectedRouteChildren {
   ProtectedBookingsRoute: typeof ProtectedBookingsRoute
-  ProtectedEventTypesRoute: typeof ProtectedEventTypesRoute
   ProtectedInsightRoute: typeof ProtectedInsightRoute
   ProtectedRoutingRoute: typeof ProtectedRoutingRoute
   ProtectedWorkflowsRoute: typeof ProtectedWorkflowsRoute
+  ProtectedEventTypesCreateRoute: typeof ProtectedEventTypesCreateRoute
+  ProtectedEventTypesIndexRoute: typeof ProtectedEventTypesIndexRoute
+  ProtectedEventTypesEventTypeIdEditRoute: typeof ProtectedEventTypesEventTypeIdEditRoute
+  ProtectedEventTypesEventTypeIdIndexRoute: typeof ProtectedEventTypesEventTypeIdIndexRoute
 }
 
 const ProtectedRouteChildren: ProtectedRouteChildren = {
   ProtectedBookingsRoute: ProtectedBookingsRoute,
-  ProtectedEventTypesRoute: ProtectedEventTypesRoute,
   ProtectedInsightRoute: ProtectedInsightRoute,
   ProtectedRoutingRoute: ProtectedRoutingRoute,
   ProtectedWorkflowsRoute: ProtectedWorkflowsRoute,
+  ProtectedEventTypesCreateRoute: ProtectedEventTypesCreateRoute,
+  ProtectedEventTypesIndexRoute: ProtectedEventTypesIndexRoute,
+  ProtectedEventTypesEventTypeIdEditRoute:
+    ProtectedEventTypesEventTypeIdEditRoute,
+  ProtectedEventTypesEventTypeIdIndexRoute:
+    ProtectedEventTypesEventTypeIdIndexRoute,
 }
 
 const ProtectedRouteWithChildren = ProtectedRoute._addFileChildren(
@@ -230,6 +319,7 @@ const rootRouteChildren: RootRouteChildren = {
   ProtectedRoute: ProtectedRouteWithChildren,
   CreateAccountRoute: CreateAccountRoute,
   LoginRoute: LoginRoute,
+  EUsernameSlugRoute: EUsernameSlugRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
