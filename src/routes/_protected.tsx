@@ -1,43 +1,8 @@
-"use client";
-
-import {
-  Link,
-  Outlet,
-  createFileRoute,
-  useNavigate,
-} from "@tanstack/react-router";
+import { Outlet, createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useInterwovenKit } from "@initia/interwovenkit-react";
 import { ClientOnly } from "@tanstack/react-router";
-import { Button } from "@/components/ui/button";
 import { useEffect } from "react";
-
-function shortenAddress(value: string) {
-  if (value.length < 14) return value;
-  return `${value.slice(0, 8)}...${value.slice(-4)}`.toUpperCase();
-}
-
-function Header() {
-  const { initiaAddress, openWallet } = useInterwovenKit();
-
-  return (
-    <header className="sticky top-0 z-50 border-b border-slate-200 bg-white">
-      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4">
-        <Link to="/" viewTransition className="flex items-center gap-2">
-          <img src="/favicon-32x32.png" alt="Calipa" className="size-6" />
-          <span className="text-xl font-black text-slate-800">Calipa</span>
-        </Link>
-
-        <div className="flex items-center gap-4">
-          {initiaAddress && (
-            <Button variant="outline" onClick={() => openWallet()}>
-              {shortenAddress(initiaAddress)}
-            </Button>
-          )}
-        </div>
-      </div>
-    </header>
-  );
-}
+import { DashboardSidebar } from "@/components/dashboard/sidebar";
 
 function ProtectedContent() {
   const { initiaAddress } = useInterwovenKit();
@@ -54,12 +19,16 @@ function ProtectedContent() {
   }
 
   return (
-    <>
-      <Header />
-      <main className="mx-auto max-w-7xl px-4 py-8">
-        <Outlet />
-      </main>
-    </>
+    <div className="flex h-screen max-w-full overflow-hidden">
+      <DashboardSidebar />
+      <div className="flex flex-1 flex-col overflow-hidden">
+        <main className="flex-1 overflow-y-auto px-4 py-8">
+          <div className="mx-auto max-w-7xl">
+            <Outlet />
+          </div>
+        </main>
+      </div>
+    </div>
   );
 }
 

@@ -62,7 +62,7 @@ function CreateAccountContent() {
 
   useEffect(() => {
     if (exists) {
-      navigate({ to: "/dashboard", viewTransition: true });
+      navigate({ to: "/event-types", viewTransition: true });
     }
   }, [exists, navigate]);
 
@@ -98,7 +98,7 @@ function CreateAccountContent() {
           bio: value.bio || "",
         });
 
-        navigate({ to: "/dashboard", viewTransition: true });
+        navigate({ to: "/event-types", viewTransition: true });
       } catch (e: unknown) {
         setError(e instanceof Error ? e.message : "Failed to create account");
       }

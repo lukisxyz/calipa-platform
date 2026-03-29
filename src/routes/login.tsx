@@ -3,14 +3,9 @@
 import { ClientOnly, createFileRoute } from "@tanstack/react-router";
 import { useInterwovenKit } from "@initia/interwovenkit-react";
 import { Button } from "@/components/ui/button";
-import { useEffect } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { useAccountExists } from "@/queries/useAccount";
-
-function shortenAddress(value: string) {
-  if (value.length < 14) return value;
-  return `${value.slice(0, 8)}...${value.slice(-4)}`;
-}
+import { shortenAddress } from "@/lib/helpers";
 
 function GrainyBackground() {
   return (
@@ -37,22 +32,20 @@ function LoginContent() {
   const navigate = useNavigate();
   const { data: exists, isLoading } = useAccountExists(initiaAddress);
 
-  useEffect(() => {
-    if (isLoading) return;
-
-    if (exists) {
-      navigate({ to: "/dashboard", viewTransition: true });
-    } else if (initiaAddress) {
-      navigate({ to: "/create-account", viewTransition: true });
-    }
-  }, [exists, initiaAddress, isLoading, navigate]);
-
   const handleConnect = () => {
     openConnect();
   };
 
   const handleDisconnect = () => {
     openWallet();
+  };
+
+  const handleContinue = () => {
+    if (exists) {
+      navigate({ to: "/event-types", viewTransition: true });
+    } else {
+      navigate({ to: "/create-account", viewTransition: true });
+    }
   };
 
   return (
@@ -154,22 +147,24 @@ function LoginContent() {
               </div>
             </div>
 
-            <div className="mt-6">
-              {initiaAddress ? (
+            <div className="mt-6 space-y-3">
+              {initiaAddress && !isLoading && (
                 <Button
-                  onClick={handleDisconnect}
+                  onClick={handleContinue}
                   className="w-full py-6 text-base font-semibold"
                 >
-                  {shortenAddress(initiaAddress)}
-                </Button>
-              ) : (
-                <Button
-                  onClick={handleConnect}
-                  className="w-full py-6 text-base font-semibold"
-                >
-                  Connect Wallet
+                  {exists ? "Go to Dashboard" : "Create Account"}
                 </Button>
               )}
+              <Button
+                onClick={initiaAddress ? handleDisconnect : handleConnect}
+                className="w-full py-6 text-base font-semibold"
+                variant={initiaAddress ? "outline" : "default"}
+              >
+                {initiaAddress
+                  ? shortenAddress(initiaAddress)
+                  : "Connect Wallet"}
+              </Button>
             </div>
           </div>
 

@@ -8,146 +8,238 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
-import { Route as rootRouteImport } from './routes/__root'
-import { Route as LoginRouteImport } from './routes/login'
-import { Route as CreateAccountRouteImport } from './routes/create-account'
-import { Route as ProtectedRouteImport } from './routes/_protected'
-import { Route as IndexRouteImport } from './routes/index'
-import { Route as ProtectedDashboardRouteImport } from './routes/_protected/dashboard'
+import { Route as rootRouteImport } from "./routes/__root";
+import { Route as LoginRouteImport } from "./routes/login";
+import { Route as CreateAccountRouteImport } from "./routes/create-account";
+import { Route as ProtectedRouteImport } from "./routes/_protected";
+import { Route as IndexRouteImport } from "./routes/index";
+import { Route as ProtectedWorkflowsRouteImport } from "./routes/_protected/workflows";
+import { Route as ProtectedRoutingRouteImport } from "./routes/_protected/routing";
+import { Route as ProtectedInsightRouteImport } from "./routes/_protected/insight";
+import { Route as ProtectedEventTypesRouteImport } from "./routes/_protected/event-types";
+import { Route as ProtectedBookingsRouteImport } from "./routes/_protected/bookings";
 
 const LoginRoute = LoginRouteImport.update({
-  id: '/login',
-  path: '/login',
+  id: "/login",
+  path: "/login",
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const CreateAccountRoute = CreateAccountRouteImport.update({
-  id: '/create-account',
-  path: '/create-account',
+  id: "/create-account",
+  path: "/create-account",
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const ProtectedRoute = ProtectedRouteImport.update({
-  id: '/_protected',
+  id: "/_protected",
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+  id: "/",
+  path: "/",
   getParentRoute: () => rootRouteImport,
-} as any)
-const ProtectedDashboardRoute = ProtectedDashboardRouteImport.update({
-  id: '/dashboard',
-  path: '/dashboard',
+} as any);
+const ProtectedWorkflowsRoute = ProtectedWorkflowsRouteImport.update({
+  id: "/workflows",
+  path: "/workflows",
   getParentRoute: () => ProtectedRoute,
-} as any)
+} as any);
+const ProtectedRoutingRoute = ProtectedRoutingRouteImport.update({
+  id: "/routing",
+  path: "/routing",
+  getParentRoute: () => ProtectedRoute,
+} as any);
+const ProtectedInsightRoute = ProtectedInsightRouteImport.update({
+  id: "/insight",
+  path: "/insight",
+  getParentRoute: () => ProtectedRoute,
+} as any);
+const ProtectedEventTypesRoute = ProtectedEventTypesRouteImport.update({
+  id: "/event-types",
+  path: "/event-types",
+  getParentRoute: () => ProtectedRoute,
+} as any);
+const ProtectedBookingsRoute = ProtectedBookingsRouteImport.update({
+  id: "/bookings",
+  path: "/bookings",
+  getParentRoute: () => ProtectedRoute,
+} as any);
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
-  '/create-account': typeof CreateAccountRoute
-  '/login': typeof LoginRoute
-  '/dashboard': typeof ProtectedDashboardRoute
+  "/": typeof IndexRoute;
+  "/create-account": typeof CreateAccountRoute;
+  "/login": typeof LoginRoute;
+  "/bookings": typeof ProtectedBookingsRoute;
+  "/event-types": typeof ProtectedEventTypesRoute;
+  "/insight": typeof ProtectedInsightRoute;
+  "/routing": typeof ProtectedRoutingRoute;
+  "/workflows": typeof ProtectedWorkflowsRoute;
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
-  '/create-account': typeof CreateAccountRoute
-  '/login': typeof LoginRoute
-  '/dashboard': typeof ProtectedDashboardRoute
+  "/": typeof IndexRoute;
+  "/create-account": typeof CreateAccountRoute;
+  "/login": typeof LoginRoute;
+  "/bookings": typeof ProtectedBookingsRoute;
+  "/event-types": typeof ProtectedEventTypesRoute;
+  "/insight": typeof ProtectedInsightRoute;
+  "/routing": typeof ProtectedRoutingRoute;
+  "/workflows": typeof ProtectedWorkflowsRoute;
 }
 export interface FileRoutesById {
-  __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
-  '/_protected': typeof ProtectedRouteWithChildren
-  '/create-account': typeof CreateAccountRoute
-  '/login': typeof LoginRoute
-  '/_protected/dashboard': typeof ProtectedDashboardRoute
+  __root__: typeof rootRouteImport;
+  "/": typeof IndexRoute;
+  "/_protected": typeof ProtectedRouteWithChildren;
+  "/create-account": typeof CreateAccountRoute;
+  "/login": typeof LoginRoute;
+  "/_protected/bookings": typeof ProtectedBookingsRoute;
+  "/_protected/event-types": typeof ProtectedEventTypesRoute;
+  "/_protected/insight": typeof ProtectedInsightRoute;
+  "/_protected/routing": typeof ProtectedRoutingRoute;
+  "/_protected/workflows": typeof ProtectedWorkflowsRoute;
 }
 export interface FileRouteTypes {
-  fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/create-account' | '/login' | '/dashboard'
-  fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/create-account' | '/login' | '/dashboard'
+  fileRoutesByFullPath: FileRoutesByFullPath;
+  fullPaths:
+    | "/"
+    | "/create-account"
+    | "/login"
+    | "/bookings"
+    | "/event-types"
+    | "/insight"
+    | "/routing"
+    | "/workflows";
+  fileRoutesByTo: FileRoutesByTo;
+  to:
+    | "/"
+    | "/create-account"
+    | "/login"
+    | "/bookings"
+    | "/event-types"
+    | "/insight"
+    | "/routing"
+    | "/workflows";
   id:
-    | '__root__'
-    | '/'
-    | '/_protected'
-    | '/create-account'
-    | '/login'
-    | '/_protected/dashboard'
-  fileRoutesById: FileRoutesById
+    | "__root__"
+    | "/"
+    | "/_protected"
+    | "/create-account"
+    | "/login"
+    | "/_protected/bookings"
+    | "/_protected/event-types"
+    | "/_protected/insight"
+    | "/_protected/routing"
+    | "/_protected/workflows";
+  fileRoutesById: FileRoutesById;
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
-  ProtectedRoute: typeof ProtectedRouteWithChildren
-  CreateAccountRoute: typeof CreateAccountRoute
-  LoginRoute: typeof LoginRoute
+  IndexRoute: typeof IndexRoute;
+  ProtectedRoute: typeof ProtectedRouteWithChildren;
+  CreateAccountRoute: typeof CreateAccountRoute;
+  LoginRoute: typeof LoginRoute;
 }
 
-declare module '@tanstack/react-router' {
+declare module "@tanstack/react-router" {
   interface FileRoutesByPath {
-    '/login': {
-      id: '/login'
-      path: '/login'
-      fullPath: '/login'
-      preLoaderRoute: typeof LoginRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/create-account': {
-      id: '/create-account'
-      path: '/create-account'
-      fullPath: '/create-account'
-      preLoaderRoute: typeof CreateAccountRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/_protected': {
-      id: '/_protected'
-      path: ''
-      fullPath: '/'
-      preLoaderRoute: typeof ProtectedRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/_protected/dashboard': {
-      id: '/_protected/dashboard'
-      path: '/dashboard'
-      fullPath: '/dashboard'
-      preLoaderRoute: typeof ProtectedDashboardRouteImport
-      parentRoute: typeof ProtectedRoute
-    }
+    "/login": {
+      id: "/login";
+      path: "/login";
+      fullPath: "/login";
+      preLoaderRoute: typeof LoginRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/create-account": {
+      id: "/create-account";
+      path: "/create-account";
+      fullPath: "/create-account";
+      preLoaderRoute: typeof CreateAccountRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/_protected": {
+      id: "/_protected";
+      path: "";
+      fullPath: "/";
+      preLoaderRoute: typeof ProtectedRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/": {
+      id: "/";
+      path: "/";
+      fullPath: "/";
+      preLoaderRoute: typeof IndexRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/_protected/workflows": {
+      id: "/_protected/workflows";
+      path: "/workflows";
+      fullPath: "/workflows";
+      preLoaderRoute: typeof ProtectedWorkflowsRouteImport;
+      parentRoute: typeof ProtectedRoute;
+    };
+    "/_protected/routing": {
+      id: "/_protected/routing";
+      path: "/routing";
+      fullPath: "/routing";
+      preLoaderRoute: typeof ProtectedRoutingRouteImport;
+      parentRoute: typeof ProtectedRoute;
+    };
+    "/_protected/insight": {
+      id: "/_protected/insight";
+      path: "/insight";
+      fullPath: "/insight";
+      preLoaderRoute: typeof ProtectedInsightRouteImport;
+      parentRoute: typeof ProtectedRoute;
+    };
+    "/_protected/event-types": {
+      id: "/_protected/event-types";
+      path: "/event-types";
+      fullPath: "/event-types";
+      preLoaderRoute: typeof ProtectedEventTypesRouteImport;
+      parentRoute: typeof ProtectedRoute;
+    };
+    "/_protected/bookings": {
+      id: "/_protected/bookings";
+      path: "/bookings";
+      fullPath: "/bookings";
+      preLoaderRoute: typeof ProtectedBookingsRouteImport;
+      parentRoute: typeof ProtectedRoute;
+    };
   }
 }
 
 interface ProtectedRouteChildren {
-  ProtectedDashboardRoute: typeof ProtectedDashboardRoute
+  ProtectedBookingsRoute: typeof ProtectedBookingsRoute;
+  ProtectedEventTypesRoute: typeof ProtectedEventTypesRoute;
+  ProtectedInsightRoute: typeof ProtectedInsightRoute;
+  ProtectedRoutingRoute: typeof ProtectedRoutingRoute;
+  ProtectedWorkflowsRoute: typeof ProtectedWorkflowsRoute;
 }
 
 const ProtectedRouteChildren: ProtectedRouteChildren = {
-  ProtectedDashboardRoute: ProtectedDashboardRoute,
-}
+  ProtectedBookingsRoute: ProtectedBookingsRoute,
+  ProtectedEventTypesRoute: ProtectedEventTypesRoute,
+  ProtectedInsightRoute: ProtectedInsightRoute,
+  ProtectedRoutingRoute: ProtectedRoutingRoute,
+  ProtectedWorkflowsRoute: ProtectedWorkflowsRoute,
+};
 
 const ProtectedRouteWithChildren = ProtectedRoute._addFileChildren(
-  ProtectedRouteChildren,
-)
+  ProtectedRouteChildren
+);
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ProtectedRoute: ProtectedRouteWithChildren,
   CreateAccountRoute: CreateAccountRoute,
   LoginRoute: LoginRoute,
-}
+};
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
-  ._addFileTypes<FileRouteTypes>()
+  ._addFileTypes<FileRouteTypes>();
 
-import type { getRouter } from './router.tsx'
-import type { createStart } from '@tanstack/react-start'
-declare module '@tanstack/react-start' {
+import type { getRouter } from "./router.tsx";
+import type { createStart } from "@tanstack/react-start";
+declare module "@tanstack/react-start" {
   interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
+    ssr: true;
+    router: Awaited<ReturnType<typeof getRouter>>;
   }
 }
