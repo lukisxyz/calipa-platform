@@ -27,7 +27,10 @@ function Home() {
   return (
     <>
       <GrainyBackground />
-      <main className="flex flex-col items-center justify-center overflow-hidden px-4 pt-24 pb-14">
+      <main
+        id="main-content"
+        className="flex flex-col items-center justify-center overflow-hidden px-4 pt-24 pb-14"
+      >
         <div className="flex max-w-3xl flex-col items-center text-center">
           <p className="mt-4 max-w-xl tracking-wide text-xs uppercase font-semibold text-slate-700 sm:text-sm">
             Secure by blockchain

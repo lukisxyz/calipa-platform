@@ -5,5 +5,5 @@
   "tabWidth": 2,
   "trailingComma": "es5",
   "printWidth": 80,
-  "ignorePatterns": ["*.md", "*.css", "*.json", "*.jsonc"]
+  "ignorePatterns": ["*.md", "*.css", "*.json", "*.jsonc", "*.gen.ts"]
 }
