@@ -1,8 +1,10 @@
 "use client";
 
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { useEventTypeById } from "@/queries/useEventTypes";
+import { useAccount } from "@/queries/useAccount";
+import { useInterwovenKit } from "@initia/interwovenkit-react";
 
 const DURATION_OPTIONS: Record<number, string> = {
   15: "15 minutes",
@@ -27,6 +29,8 @@ export const Route = createFileRoute("/_protected/event-types/$eventTypeId/")({
 function EventTypeDetailPage() {
   const { eventTypeId } = Route.useParams();
   const navigate = useNavigate();
+  const { initiaAddress } = useInterwovenKit();
+  const { data: account } = useAccount(initiaAddress);
   const { data: eventType, isLoading } = useEventTypeById(eventTypeId);
 
   if (isLoading) {
@@ -198,11 +202,20 @@ function EventTypeDetailPage() {
         )}
       </div>
 
-      <div className="flex gap-3">
+      <div className="flex gap-3 flex-col">
+        {account?.username && (
+          <Link
+            to="/e/$username/$slug"
+            params={{ username: account.username, slug: eventType.slug }}
+            target="_blank"
+            className="inline-flex items-center justify-center gap-2 rounded-md border border-input bg-background px-4 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground h-8"
+          >
+            View Public Page
+          </Link>
+        )}
         <Button
           variant="outline"
           onClick={() => navigate({ to: "/event-types" })}
-          className="flex-1"
         >
           Back to Event Types
         </Button>
