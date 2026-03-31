@@ -1,4 +1,4 @@
-import { sqliteTable, text, integer } from "drizzle-orm/sqlite-core";
+import { sqliteTable, text, integer, index } from "drizzle-orm/sqlite-core";
 
 export const accounts = sqliteTable("accounts", {
   walletAddress: text("wallet_address").primaryKey(),
@@ -35,10 +35,63 @@ export const eventTypes = sqliteTable("event_types", {
   updatedAt: integer("updated_at", { mode: "timestamp" }).notNull(),
 });
 
+export const bookings = sqliteTable(
+  "bookings",
+  {
+    id: text("id").primaryKey(),
+    eventTypeId: text("event_type_id")
+      .notNull()
+      .references(() => eventTypes.id),
+    hostAccountId: text("host_account_id")
+      .notNull()
+      .references(() => accounts.walletAddress),
+    bookerName: text("booker_name").notNull(),
+    bookerEmail: text("booker_email").notNull(),
+    bookerTimezone: text("booker_timezone").notNull(),
+    bookerWalletAddress: text("booker_wallet_address"),
+    notes: text("notes"),
+    startTime: integer("start_time", { mode: "timestamp" }).notNull(),
+    endTime: integer("end_time", { mode: "timestamp" }).notNull(),
+    status: text("status").notNull().default("pending"),
+    cancelledAt: integer("cancelled_at", { mode: "timestamp" }),
+    cancellationReason: text("cancellation_reason"),
+    createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
+    updatedAt: integer("updated_at", { mode: "timestamp" }).notNull(),
+  },
+  (table) => ({
+    eventTypeIdIdx: index("bookings_event_type_id_idx").on(table.eventTypeId),
+    hostAccountIdIdx: index("bookings_host_account_id_idx").on(
+      table.hostAccountId
+    ),
+    startTimeIdx: index("bookings_start_time_idx").on(table.startTime),
+    statusIdx: index("bookings_status_idx").on(table.status),
+  })
+);
+
+export const payments = sqliteTable("payments", {
+  id: text("id").primaryKey(),
+  bookingId: text("booking_id")
+    .notNull()
+    .references(() => bookings.id),
+  amount: integer("amount").notNull(),
+  currency: text("currency").notNull().default("USD"),
+  status: text("status").notNull().default("pending"),
+  paymentProvider: text("payment_provider"),
+  paymentReference: text("payment_reference"),
+  paidAt: integer("paid_at", { mode: "timestamp" }),
+  refundedAt: integer("refunded_at", { mode: "timestamp" }),
+  createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
+  updatedAt: integer("updated_at", { mode: "timestamp" }).notNull(),
+});
+
 export type Account = typeof accounts.$inferSelect;
 export type NewAccount = typeof accounts.$inferInsert;
 export type EventType = typeof eventTypes.$inferSelect;
 export type NewEventType = typeof eventTypes.$inferInsert;
+export type Booking = typeof bookings.$inferSelect;
+export type NewBooking = typeof bookings.$inferInsert;
+export type Payment = typeof payments.$inferSelect;
+export type NewPayment = typeof payments.$inferInsert;
 
 export type AccountInput = Omit<
   Account,
@@ -60,4 +113,20 @@ export type EventTypeInput = {
   seatLimit: number | null;
   requiresConfirmation: boolean | null;
   cancellationPolicy: string | null;
+};
+
+export type BookingStatus = "pending" | "confirmed" | "cancelled" | "completed";
+export type PaymentStatus = "pending" | "paid" | "refunded" | "failed";
+
+export type BookingInput = {
+  eventTypeId: string;
+  hostAccountId: string;
+  bookerName: string;
+  bookerEmail: string;
+  bookerTimezone: string;
+  bookerWalletAddress?: string | null;
+  notes?: string | null;
+  startTime: Date;
+  endTime: Date;
+  status?: BookingStatus;
 };

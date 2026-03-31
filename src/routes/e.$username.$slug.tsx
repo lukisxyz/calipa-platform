@@ -172,15 +172,22 @@ function BookingPage() {
   };
 
   return (
-    <div className="h-screen overflow-hidden bg-[#f5f5f5] p-3.5 flex items-center justify-center">
+    <div className="h-screen overflow-hidden bg-[#f5f5f5] p-3.5 flex justify-center pt-20">
       <div className="mx-auto max-w-6xl">
         <div className="grid grid-cols-3 gap-3">
           {/* Event Information */}
           <div className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm overflow-auto">
             <h2 className="mb-3 text-base font-semibold text-slate-900">
-              Event Details
+              {eventType.name}
             </h2>
             <div className="space-y-2.5">
+              <div>
+                {eventType.description && (
+                  <p className="py-2 text-sm text-slate-500">
+                    {eventType.description}
+                  </p>
+                )}
+              </div>
               <div className="flex items-center justify-between border-b border-slate-100 pb-2.5">
                 <span className="text-sm text-slate-500">Host</span>
                 <div className="text-right">
@@ -240,7 +247,7 @@ function BookingPage() {
           </div>
 
           {/* Calendar */}
-          <div className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
+          <div className="rounded-lg border border-slate-200 bg-white p-4 min-h-132 shadow-sm">
             <h2 className="mb-3 text-base font-semibold text-slate-900">
               <span className="flex items-center gap-2">
                 <CalendarIcon className="size-4 text-slate-500" />
@@ -263,7 +270,6 @@ function BookingPage() {
               }
               className="rounded-md [--cell-size:3rem]"
             />
-            <p className="mt-2 text-xs text-slate-500">Select a weekday</p>
           </div>
 
           {/* Available Times */}
