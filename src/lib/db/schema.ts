@@ -26,6 +26,9 @@ export const eventTypes = sqliteTable("event_types", {
   bookingUrl: text("booking_url"),
   bookingWindowStart: integer("booking_window_start"),
   bookingWindowEnd: integer("booking_window_end"),
+  startTime: integer("start_time"),
+  endTime: integer("end_time"),
+  bufferTime: integer("buffer_time").default(0),
   seatLimit: integer("seat_limit").default(1),
   requiresConfirmation: integer("requires_confirmation", {
     mode: "boolean",
@@ -110,6 +113,9 @@ export type EventTypeInput = {
   bookingUrl: string | null;
   bookingWindowStart: number | null;
   bookingWindowEnd: number | null;
+  startTime: number | null;
+  endTime: number | null;
+  bufferTime: number | null;
   seatLimit: number | null;
   requiresConfirmation: boolean | null;
   cancellationPolicy: string | null;

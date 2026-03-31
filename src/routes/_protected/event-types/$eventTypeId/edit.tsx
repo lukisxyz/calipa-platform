@@ -32,6 +32,9 @@ const eventTypeSchema = v.object({
   bookingUrl: v.optional(v.string()),
   bookingWindowStart: v.optional(v.number()),
   bookingWindowEnd: v.optional(v.number()),
+  startTime: v.optional(v.number()),
+  endTime: v.optional(v.number()),
+  bufferTime: v.optional(v.number()),
   seatLimit: v.pipe(v.number(), v.minValue(1), v.maxValue(100)),
   requiresConfirmation: v.optional(v.boolean()),
   cancellationPolicy: v.optional(v.string()),
@@ -51,6 +54,27 @@ const LOCATION_OPTIONS = [
   { value: "zoom", label: "Zoom" },
   { value: "google-meet", label: "Google Meet" },
   { value: "custom", label: "Custom Link" },
+];
+
+function generateTimeOptions() {
+  const options = [];
+  for (let minutes = 0; minutes < 24 * 60; minutes += 30) {
+    const hours = Math.floor(minutes / 60);
+    const mins = minutes % 60;
+    const label = `${hours.toString().padStart(2, "0")}:${mins.toString().padStart(2, "0")}`;
+    options.push({ value: minutes, label });
+  }
+  return options;
+}
+
+const TIME_OPTIONS = generateTimeOptions();
+
+const BUFFER_TIME_OPTIONS = [
+  { value: 0, label: "No buffer" },
+  { value: 5, label: "5 minutes" },
+  { value: 10, label: "10 minutes" },
+  { value: 15, label: "15 minutes" },
+  { value: 30, label: "30 minutes" },
 ];
 
 export const Route = createFileRoute(
@@ -77,6 +101,9 @@ function EditEventTypePage() {
       bookingUrl: "",
       bookingWindowStart: 0,
       bookingWindowEnd: 30,
+      startTime: 540,
+      endTime: 1020,
+      bufferTime: 0,
       seatLimit: 1,
       requiresConfirmation: false,
       cancellationPolicy: "",
@@ -102,6 +129,9 @@ function EditEventTypePage() {
           bookingUrl: value.bookingUrl || null,
           bookingWindowStart: value.bookingWindowStart ?? null,
           bookingWindowEnd: value.bookingWindowEnd ?? null,
+          startTime: value.startTime ?? null,
+          endTime: value.endTime ?? null,
+          bufferTime: value.bufferTime ?? null,
           seatLimit: value.seatLimit,
           requiresConfirmation: value.requiresConfirmation ?? false,
           cancellationPolicy: value.cancellationPolicy || null,
@@ -120,7 +150,6 @@ function EditEventTypePage() {
     },
   });
 
-  // Populate form with event type data when loaded
   useEffect(() => {
     if (eventType) {
       form.reset({
@@ -133,6 +162,9 @@ function EditEventTypePage() {
         bookingUrl: eventType.bookingUrl ?? "",
         bookingWindowStart: eventType.bookingWindowStart ?? 0,
         bookingWindowEnd: eventType.bookingWindowEnd ?? 30,
+        startTime: eventType.startTime ?? 540,
+        endTime: eventType.endTime ?? 1020,
+        bufferTime: eventType.bufferTime ?? 0,
         seatLimit: eventType.seatLimit ?? 1,
         requiresConfirmation: eventType.requiresConfirmation ?? false,
         cancellationPolicy: eventType.cancellationPolicy ?? "",
@@ -381,6 +413,71 @@ function EditEventTypePage() {
                     onBlur={field.handleBlur}
                     placeholder="30"
                   />
+                </div>
+              )}
+            />
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-3">
+            <form.Field
+              name="startTime"
+              children={(field) => (
+                <div className="space-y-2">
+                  <Label htmlFor={field.name}>Working Hours Start</Label>
+                  <select
+                    id={field.name}
+                    value={field.state.value}
+                    onChange={(e) => field.handleChange(Number(e.target.value))}
+                    className="flex h-10 w-full rounded-md border border-input bg-white px-3 py-2 text-sm ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    {TIME_OPTIONS.map((option) => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
+            />
+
+            <form.Field
+              name="endTime"
+              children={(field) => (
+                <div className="space-y-2">
+                  <Label htmlFor={field.name}>Working Hours End</Label>
+                  <select
+                    id={field.name}
+                    value={field.state.value}
+                    onChange={(e) => field.handleChange(Number(e.target.value))}
+                    className="flex h-10 w-full rounded-md border border-input bg-white px-3 py-2 text-sm ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    {TIME_OPTIONS.map((option) => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
+            />
+
+            <form.Field
+              name="bufferTime"
+              children={(field) => (
+                <div className="space-y-2">
+                  <Label htmlFor={field.name}>Buffer Time</Label>
+                  <select
+                    id={field.name}
+                    value={field.state.value}
+                    onChange={(e) => field.handleChange(Number(e.target.value))}
+                    className="flex h-10 w-full rounded-md border border-input bg-white px-3 py-2 text-sm ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    {BUFFER_TIME_OPTIONS.map((option) => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
                 </div>
               )}
             />

@@ -339,6 +339,12 @@ export const checkSlotAvailability = createServerFn({ method: "GET" })
     const conflictType = eventType.requiresConfirmation
       ? "pending"
       : "confirmed";
+    const bufferTime = eventType.bufferTime ?? 0;
+
+    const effectiveEndTime = new Date(
+      data.endTime.getTime() + bufferTime * 60 * 1000
+    );
+
     const overlappingBookings = await db
       .select()
       .from(bookings)
@@ -346,7 +352,7 @@ export const checkSlotAvailability = createServerFn({ method: "GET" })
         and(
           eq(bookings.eventTypeId, data.eventTypeId),
           eq(bookings.status, conflictType),
-          lt(bookings.startTime, data.endTime),
+          lt(bookings.startTime, effectiveEndTime),
           gt(bookings.endTime, data.startTime)
         )
       );
@@ -374,6 +380,12 @@ export const createBooking = createServerFn({ method: "POST" })
     const conflictType = eventType.requiresConfirmation
       ? "pending"
       : "confirmed";
+    const bufferTime = eventType.bufferTime ?? 0;
+
+    const effectiveEndTime = new Date(
+      data.endTime.getTime() + bufferTime * 60 * 1000
+    );
+
     const overlappingBookings = await db
       .select()
       .from(bookings)
@@ -381,7 +393,7 @@ export const createBooking = createServerFn({ method: "POST" })
         and(
           eq(bookings.eventTypeId, data.eventTypeId),
           eq(bookings.status, conflictType),
-          lt(bookings.startTime, data.endTime),
+          lt(bookings.startTime, effectiveEndTime),
           gt(bookings.endTime, data.startTime)
         )
       );

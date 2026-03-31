@@ -22,6 +22,15 @@ const LOCATION_LABELS: Record<string, string> = {
   custom: "Custom Link",
 };
 
+function formatMinutesToTime(minutes: number | null): string {
+  if (minutes === null || minutes === undefined) return "Not set";
+  const hours = Math.floor(minutes / 60);
+  const mins = minutes % 60;
+  const period = hours >= 12 ? "PM" : "AM";
+  const displayHours = hours % 12 || 12;
+  return `${displayHours}:${mins.toString().padStart(2, "0")} ${period}`;
+}
+
 export const Route = createFileRoute("/_protected/event-types/$eventTypeId/")({
   component: EventTypeDetailPage,
 });
@@ -188,6 +197,33 @@ function EventTypeDetailPage() {
                 </p>
               </div>
             )}
+
+          <div>
+            <h3 className="text-sm font-medium text-slate-700">
+              Working Hours Start
+            </h3>
+            <p className="mt-1 text-sm text-slate-600">
+              {formatMinutesToTime(eventType.startTime)}
+            </p>
+          </div>
+
+          <div>
+            <h3 className="text-sm font-medium text-slate-700">
+              Working Hours End
+            </h3>
+            <p className="mt-1 text-sm text-slate-600">
+              {formatMinutesToTime(eventType.endTime)}
+            </p>
+          </div>
+
+          <div>
+            <h3 className="text-sm font-medium text-slate-700">Buffer Time</h3>
+            <p className="mt-1 text-sm text-slate-600">
+              {eventType.bufferTime
+                ? `${eventType.bufferTime} minutes`
+                : "None"}
+            </p>
+          </div>
         </div>
 
         {eventType.cancellationPolicy && (
