@@ -3,6 +3,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEventTypeByUsernameAndSlug } from "@/queries/useEventTypes";
 import { useAccountByUsername } from "@/queries/useAccount";
+import { useMentorFee, useBookSession } from "@/hooks/useCalipaScheduling";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -28,6 +29,7 @@ import {
   Globe,
   Wallet,
   LogOut,
+  DollarSign,
 } from "lucide-react";
 import { useInterwovenKit } from "@initia/interwovenkit-react";
 
@@ -46,6 +48,7 @@ const bookingSchema = v.object({
   walletAddress: v.optional(v.string()),
   notes: v.optional(v.string()),
   date: v.pipe(v.string(), v.minLength(1, "Please select a date")),
+  tip: v.optional(v.number()),
 });
 
 function getTimeSlots(
@@ -119,19 +122,27 @@ function BookingPage() {
   const { data: account, isLoading: accountLoading } =
     useAccountByUsername(username);
 
+  const { address: walletAddress } = useInterwovenKit();
+  const { mentorFee, isLoading: mentorFeeLoading } = useMentorFee(
+    account?.walletAddress
+  );
+  const bookSession = useBookSession();
+
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
   const [showModal, setShowModal] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const [isProcessingPayment, setIsProcessingPayment] = useState(false);
 
   const form = useForm({
     defaultValues: {
       name: "",
       email: "",
       timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-      walletAddress: "",
+      walletAddress: walletAddress || "",
       notes: "",
+      tip: 0,
     },
     onSubmit: async ({ value }) => {
       const result = v.safeParse(bookingSchema, {
@@ -144,14 +155,55 @@ function BookingPage() {
       }
 
       setError(null);
-      console.log("Booking submitted:", {
-        ...value,
-        date: selectedDate,
-        time: selectedTime,
-        eventTypeId: eventType?.id,
-      });
-      setSuccess(true);
-      setShowModal(false);
+
+      const priceType = eventType?.priceType || "free";
+
+      // For paid and commitment events, wallet must be connected
+      if (
+        (priceType === "paid" || priceType === "commitment") &&
+        !walletAddress
+      ) {
+        setError("Please connect your wallet to book this event");
+        return;
+      }
+
+      setIsProcessingPayment(true);
+
+      try {
+        // Handle different price types
+        if (priceType === "commitment" && mentorFee && mentorFee > 0n) {
+          // Book session with commitment fee (stake)
+          const timestamp = BigInt(
+            Math.floor(
+              new Date(
+                selectedDate!.toISOString().split("T")[0] +
+                  "T" +
+                  selectedTime +
+                  ":00"
+              ).getTime() / 1000
+            )
+          );
+          await bookSession.bookSession(account!.walletAddress, timestamp);
+        }
+
+        // Log booking details (in production, this would call an API)
+        console.log("Booking submitted:", {
+          ...value,
+          date: selectedDate,
+          time: selectedTime,
+          eventTypeId: eventType?.id,
+          priceType,
+          price: eventType?.price,
+          tip: value.tip,
+        });
+
+        setSuccess(true);
+        setShowModal(false);
+      } catch (e: unknown) {
+        setError(e instanceof Error ? e.message : "Failed to process booking");
+      } finally {
+        setIsProcessingPayment(false);
+      }
     },
   });
 
@@ -270,6 +322,59 @@ function BookingPage() {
                     {eventType.duration} min
                   </span>
                 </div>
+                {/* Price type display - always show */}
+                <div className="flex items-center justify-between border-b border-slate-100 py-2.5">
+                  <span className="text-sm text-slate-500">Pricing</span>
+                  <span
+                    className={cn(
+                      "text-sm font-medium",
+                      eventType.priceType === "paid"
+                        ? "text-green-600"
+                        : eventType.priceType === "commitment"
+                          ? "text-amber-600"
+                          : "text-slate-900"
+                    )}
+                  >
+                    {eventType.priceType === "free"
+                      ? "Free"
+                      : eventType.priceType === "paid"
+                        ? `Paid · ${(eventType.price || 0) / 1e6} USDC`
+                        : eventType.priceType === "commitment"
+                          ? mentorFeeLoading
+                            ? "Commitment · Loading..."
+                            : mentorFee
+                              ? `Commitment · ${Number(mentorFee) / 1e6} USDC`
+                              : "Commitment"
+                          : "Free"}
+                  </span>
+                </div>
+                {/* Price display */}
+                {eventType.priceType !== "free" && (
+                  <div className="flex items-center justify-between border-b border-slate-100 py-2.5">
+                    <span className="text-sm text-slate-500">
+                      {eventType.priceType === "commitment"
+                        ? "Stake Amount"
+                        : "Price"}
+                    </span>
+                    <span className="text-sm font-medium text-slate-900">
+                      {eventType.priceType === "commitment"
+                        ? mentorFeeLoading
+                          ? "Loading..."
+                          : mentorFee
+                            ? `${Number(mentorFee) / 1e6} USDC`
+                            : "Not set"
+                        : `${(eventType.price || 0) / 1e6} ${eventType.currency || "USDC"}`}
+                    </span>
+                  </div>
+                )}
+                {eventType.priceType === "free" && eventType.tipEnabled && (
+                  <div className="flex items-center justify-between border-b border-slate-100 py-2.5">
+                    <span className="text-sm text-slate-500">Tip</span>
+                    <span className="text-sm font-medium text-slate-900">
+                      Optional
+                    </span>
+                  </div>
+                )}
                 {locationText && (
                   <div className="flex items-center justify-between border-b border-slate-100 py-2.5">
                     <span className="text-sm text-slate-500">Location</span>
@@ -522,6 +627,42 @@ function BookingPage() {
                   )}
                 />
 
+                {/* Tip input for free events with tip enabled */}
+                {eventType.priceType === "free" && eventType.tipEnabled && (
+                  <form.Field
+                    name="tip"
+                    children={(field) => (
+                      <div className="space-y-1">
+                        <Label
+                          htmlFor={field.name}
+                          className="text-sm font-medium"
+                        >
+                          <span className="flex items-center gap-1">
+                            <DollarSign className="size-3" />
+                            Tip (optional)
+                          </span>
+                        </Label>
+                        <Input
+                          id={field.name}
+                          name={field.name}
+                          type="number"
+                          min={0}
+                          step={0.01}
+                          value={field.state.value}
+                          onChange={(e) =>
+                            field.handleChange(Number(e.target.value))
+                          }
+                          onBlur={field.handleBlur}
+                          placeholder="0.00"
+                        />
+                        <p className="text-xs text-slate-500">
+                          Show appreciation with a tip in USDC
+                        </p>
+                      </div>
+                    )}
+                  />
+                )}
+
                 {error && <p className="text-sm text-red-500">{error}</p>}
 
                 <DialogFooter>
@@ -532,10 +673,16 @@ function BookingPage() {
                   >
                     Cancel
                   </Button>
-                  <Button type="submit">
-                    {eventType.requiresConfirmation
-                      ? "Request to Book"
-                      : "Confirm Booking"}
+                  <Button type="submit" disabled={isProcessingPayment}>
+                    {isProcessingPayment
+                      ? "Processing..."
+                      : eventType.priceType === "paid"
+                        ? `Pay ${(eventType.price || 0) / 1e6} USDC & Book`
+                        : eventType.priceType === "commitment"
+                          ? "Book & Stake"
+                          : eventType.requiresConfirmation
+                            ? "Request to Book"
+                            : "Confirm Booking"}
                   </Button>
                 </DialogFooter>
               </form>

@@ -34,6 +34,11 @@ export const eventTypes = sqliteTable("event_types", {
     mode: "boolean",
   }).default(false),
   cancellationPolicy: text("cancellation_policy"),
+  // Price fields
+  price: integer("price").default(0), // Price in USDC (smallest unit, 6 decimals)
+  priceType: text("priceType", { length: 20 }).default("free"), // "free" | "paid" | "commitment"
+  currency: text("currency", { length: 10 }).default("USDC"),
+  tipEnabled: integer("tipEnabled", { mode: "boolean" }).default(false), // Enable tip for free events
   createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
   updatedAt: integer("updated_at", { mode: "timestamp" }).notNull(),
 });
@@ -81,6 +86,7 @@ export const payments = sqliteTable("payments", {
   status: text("status").notNull().default("pending"),
   paymentProvider: text("payment_provider"),
   paymentReference: text("payment_reference"),
+  paymentType: text("payment_type", { length: 20 }), // "free" | "paid" | "commitment" | "tip"
   paidAt: integer("paid_at", { mode: "timestamp" }),
   refundedAt: integer("refunded_at", { mode: "timestamp" }),
   createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
@@ -119,6 +125,11 @@ export type EventTypeInput = {
   seatLimit: number | null;
   requiresConfirmation: boolean | null;
   cancellationPolicy: string | null;
+  // Price fields
+  price: number | null;
+  priceType: string | null;
+  currency: string | null;
+  tipEnabled: boolean | null;
 };
 
 export type BookingStatus = "pending" | "confirmed" | "cancelled" | "completed";

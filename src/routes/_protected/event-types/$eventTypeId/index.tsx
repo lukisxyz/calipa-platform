@@ -224,6 +224,40 @@ function EventTypeDetailPage() {
                 : "None"}
             </p>
           </div>
+
+          <div>
+            <h3 className="text-sm font-medium text-slate-700">Event Type</h3>
+            <p className="mt-1 text-sm text-slate-600 capitalize">
+              {eventType.priceType || "free"}
+            </p>
+          </div>
+
+          {eventType.priceType === "paid" && (
+            <div>
+              <h3 className="text-sm font-medium text-slate-700">Price</h3>
+              <p className="mt-1 text-sm text-slate-600">
+                {(eventType.price || 0) / 1e6} {eventType.currency || "USDC"}
+              </p>
+            </div>
+          )}
+
+          {eventType.priceType === "commitment" && (
+            <div>
+              <h3 className="text-sm font-medium text-slate-700">
+                Commitment Fee
+              </h3>
+              <p className="mt-1 text-sm text-slate-600">
+                Set via contract (mentorFee)
+              </p>
+            </div>
+          )}
+
+          {eventType.priceType === "free" && eventType.tipEnabled && (
+            <div>
+              <h3 className="text-sm font-medium text-slate-700">Tips</h3>
+              <p className="mt-1 text-sm text-slate-600">Enabled</p>
+            </div>
+          )}
         </div>
 
         {eventType.cancellationPolicy && (

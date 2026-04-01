@@ -76,6 +76,14 @@ function EventTypesPage() {
                 {(eventType.seatLimit ?? 1) > 1 && (
                   <span>{eventType.seatLimit} guests</span>
                 )}
+                {eventType.priceType === "paid" && (
+                  <span className="text-green-600 font-medium">
+                    {(eventType.price || 0) / 1e6} USDC
+                  </span>
+                )}
+                {eventType.priceType === "commitment" && (
+                  <span className="text-amber-600 font-medium">Commitment</span>
+                )}
               </div>
             </Link>
           ))}

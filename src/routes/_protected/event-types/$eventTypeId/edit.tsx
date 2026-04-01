@@ -38,6 +38,9 @@ const eventTypeSchema = v.object({
   seatLimit: v.pipe(v.number(), v.minValue(1), v.maxValue(100)),
   requiresConfirmation: v.optional(v.boolean()),
   cancellationPolicy: v.optional(v.string()),
+  priceType: v.optional(v.string()),
+  price: v.optional(v.number()),
+  tipEnabled: v.optional(v.boolean()),
 });
 
 const DURATION_OPTIONS = [
@@ -107,6 +110,9 @@ function EditEventTypePage() {
       seatLimit: 1,
       requiresConfirmation: false,
       cancellationPolicy: "",
+      priceType: "free",
+      price: 0,
+      tipEnabled: false,
     },
     onSubmit: async ({ value }) => {
       const result = v.safeParse(eventTypeSchema, value);
@@ -135,6 +141,10 @@ function EditEventTypePage() {
           seatLimit: value.seatLimit,
           requiresConfirmation: value.requiresConfirmation ?? false,
           cancellationPolicy: value.cancellationPolicy || null,
+          priceType: value.priceType || "free",
+          price: value.price ?? null,
+          currency: "USDC",
+          tipEnabled: value.tipEnabled ?? false,
         });
 
         navigate({
@@ -168,6 +178,9 @@ function EditEventTypePage() {
         seatLimit: eventType.seatLimit ?? 1,
         requiresConfirmation: eventType.requiresConfirmation ?? false,
         cancellationPolicy: eventType.cancellationPolicy ?? "",
+        priceType: eventType.priceType ?? "free",
+        price: eventType.price ?? 0,
+        tipEnabled: eventType.tipEnabled ?? false,
       });
     }
   }, [eventType, form]);
@@ -540,6 +553,97 @@ function EditEventTypePage() {
               </div>
             )}
           />
+
+          {/* Price Type Section */}
+          <div className="space-y-3 rounded-lg border border-slate-200 bg-slate-50 p-4">
+            <div className="space-y-2">
+              <Label className="text-sm font-medium">Event Type</Label>
+              <form.Field
+                name="priceType"
+                children={(field) => (
+                  <div className="grid grid-cols-3 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => field.handleChange("free")}
+                      className={`rounded-md border px-3 py-2 text-sm font-medium transition-colors ${
+                        field.state.value === "free"
+                          ? "border-slate-800 bg-slate-800 text-white"
+                          : "border-slate-200 bg-white text-slate-600 hover:border-slate-300"
+                      }`}
+                    >
+                      Free
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => field.handleChange("paid")}
+                      className={`rounded-md border px-3 py-2 text-sm font-medium transition-colors ${
+                        field.state.value === "paid"
+                          ? "border-slate-800 bg-slate-800 text-white"
+                          : "border-slate-200 bg-white text-slate-600 hover:border-slate-300"
+                      }`}
+                    >
+                      Paid
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => field.handleChange("commitment")}
+                      className={`rounded-md border px-3 py-2 text-sm font-medium transition-colors ${
+                        field.state.value === "commitment"
+                          ? "border-slate-800 bg-slate-800 text-white"
+                          : "border-slate-200 bg-white text-slate-600 hover:border-slate-300"
+                      }`}
+                    >
+                      Commitment
+                    </button>
+                  </div>
+                )}
+              />
+            </div>
+
+            {/* Price input for paid events */}
+            <form.Field
+              name="price"
+              children={(field) => (
+                <div
+                  className={`space-y-2 ${form.state.values.priceType !== "paid" ? "hidden" : ""}`}
+                >
+                  <Label htmlFor={field.name}>Price (USDC)</Label>
+                  <Input
+                    id={field.name}
+                    name={field.name}
+                    type="number"
+                    min={0}
+                    step={0.01}
+                    value={field.state.value}
+                    onChange={(e) => field.handleChange(Number(e.target.value))}
+                    onBlur={field.handleBlur}
+                    placeholder="0.00"
+                  />
+                </div>
+              )}
+            />
+
+            {/* Tip toggle for free events */}
+            <form.Field
+              name="tipEnabled"
+              children={(field) => (
+                <div
+                  className={`flex items-center gap-2 ${form.state.values.priceType !== "free" ? "hidden" : ""}`}
+                >
+                  <input
+                    type="checkbox"
+                    id={field.name}
+                    checked={field.state.value}
+                    onChange={(e) => field.handleChange(e.target.checked)}
+                    className="size-4"
+                  />
+                  <Label htmlFor={field.name} className="font-normal text-sm">
+                    Allow tips/gratuity
+                  </Label>
+                </div>
+              )}
+            />
+          </div>
 
           {error && <p className="text-sm text-red-500">{error}</p>}
 
