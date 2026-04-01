@@ -16,7 +16,9 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as ProtectedWorkflowsRouteImport } from './routes/_protected/workflows'
 import { Route as ProtectedRoutingRouteImport } from './routes/_protected/routing'
 import { Route as ProtectedInsightRouteImport } from './routes/_protected/insight'
+import { Route as ProtectedEditAccountRouteImport } from './routes/_protected/edit-account'
 import { Route as ProtectedBookingsRouteImport } from './routes/_protected/bookings'
+import { Route as ProtectedAccountRouteImport } from './routes/_protected/account'
 import { Route as ProtectedEventTypesIndexRouteImport } from './routes/_protected/event-types/index'
 import { Route as EUsernameSlugRouteImport } from './routes/e.$username.$slug'
 import { Route as ProtectedEventTypesCreateRouteImport } from './routes/_protected/event-types/create'
@@ -57,9 +59,19 @@ const ProtectedInsightRoute = ProtectedInsightRouteImport.update({
   path: '/insight',
   getParentRoute: () => ProtectedRoute,
 } as any)
+const ProtectedEditAccountRoute = ProtectedEditAccountRouteImport.update({
+  id: '/edit-account',
+  path: '/edit-account',
+  getParentRoute: () => ProtectedRoute,
+} as any)
 const ProtectedBookingsRoute = ProtectedBookingsRouteImport.update({
   id: '/bookings',
   path: '/bookings',
+  getParentRoute: () => ProtectedRoute,
+} as any)
+const ProtectedAccountRoute = ProtectedAccountRouteImport.update({
+  id: '/account',
+  path: '/account',
   getParentRoute: () => ProtectedRoute,
 } as any)
 const ProtectedEventTypesIndexRoute =
@@ -96,7 +108,9 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/create-account': typeof CreateAccountRoute
   '/login': typeof LoginRoute
+  '/account': typeof ProtectedAccountRoute
   '/bookings': typeof ProtectedBookingsRoute
+  '/edit-account': typeof ProtectedEditAccountRoute
   '/insight': typeof ProtectedInsightRoute
   '/routing': typeof ProtectedRoutingRoute
   '/workflows': typeof ProtectedWorkflowsRoute
@@ -110,7 +124,9 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/create-account': typeof CreateAccountRoute
   '/login': typeof LoginRoute
+  '/account': typeof ProtectedAccountRoute
   '/bookings': typeof ProtectedBookingsRoute
+  '/edit-account': typeof ProtectedEditAccountRoute
   '/insight': typeof ProtectedInsightRoute
   '/routing': typeof ProtectedRoutingRoute
   '/workflows': typeof ProtectedWorkflowsRoute
@@ -126,7 +142,9 @@ export interface FileRoutesById {
   '/_protected': typeof ProtectedRouteWithChildren
   '/create-account': typeof CreateAccountRoute
   '/login': typeof LoginRoute
+  '/_protected/account': typeof ProtectedAccountRoute
   '/_protected/bookings': typeof ProtectedBookingsRoute
+  '/_protected/edit-account': typeof ProtectedEditAccountRoute
   '/_protected/insight': typeof ProtectedInsightRoute
   '/_protected/routing': typeof ProtectedRoutingRoute
   '/_protected/workflows': typeof ProtectedWorkflowsRoute
@@ -142,7 +160,9 @@ export interface FileRouteTypes {
     | '/'
     | '/create-account'
     | '/login'
+    | '/account'
     | '/bookings'
+    | '/edit-account'
     | '/insight'
     | '/routing'
     | '/workflows'
@@ -156,7 +176,9 @@ export interface FileRouteTypes {
     | '/'
     | '/create-account'
     | '/login'
+    | '/account'
     | '/bookings'
+    | '/edit-account'
     | '/insight'
     | '/routing'
     | '/workflows'
@@ -171,7 +193,9 @@ export interface FileRouteTypes {
     | '/_protected'
     | '/create-account'
     | '/login'
+    | '/_protected/account'
     | '/_protected/bookings'
+    | '/_protected/edit-account'
     | '/_protected/insight'
     | '/_protected/routing'
     | '/_protected/workflows'
@@ -241,11 +265,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProtectedInsightRouteImport
       parentRoute: typeof ProtectedRoute
     }
+    '/_protected/edit-account': {
+      id: '/_protected/edit-account'
+      path: '/edit-account'
+      fullPath: '/edit-account'
+      preLoaderRoute: typeof ProtectedEditAccountRouteImport
+      parentRoute: typeof ProtectedRoute
+    }
     '/_protected/bookings': {
       id: '/_protected/bookings'
       path: '/bookings'
       fullPath: '/bookings'
       preLoaderRoute: typeof ProtectedBookingsRouteImport
+      parentRoute: typeof ProtectedRoute
+    }
+    '/_protected/account': {
+      id: '/_protected/account'
+      path: '/account'
+      fullPath: '/account'
+      preLoaderRoute: typeof ProtectedAccountRouteImport
       parentRoute: typeof ProtectedRoute
     }
     '/_protected/event-types/': {
@@ -287,7 +325,9 @@ declare module '@tanstack/react-router' {
 }
 
 interface ProtectedRouteChildren {
+  ProtectedAccountRoute: typeof ProtectedAccountRoute
   ProtectedBookingsRoute: typeof ProtectedBookingsRoute
+  ProtectedEditAccountRoute: typeof ProtectedEditAccountRoute
   ProtectedInsightRoute: typeof ProtectedInsightRoute
   ProtectedRoutingRoute: typeof ProtectedRoutingRoute
   ProtectedWorkflowsRoute: typeof ProtectedWorkflowsRoute
@@ -298,7 +338,9 @@ interface ProtectedRouteChildren {
 }
 
 const ProtectedRouteChildren: ProtectedRouteChildren = {
+  ProtectedAccountRoute: ProtectedAccountRoute,
   ProtectedBookingsRoute: ProtectedBookingsRoute,
+  ProtectedEditAccountRoute: ProtectedEditAccountRoute,
   ProtectedInsightRoute: ProtectedInsightRoute,
   ProtectedRoutingRoute: ProtectedRoutingRoute,
   ProtectedWorkflowsRoute: ProtectedWorkflowsRoute,

@@ -239,7 +239,7 @@ function BookingPage() {
   return (
     <>
       <Header />
-      <div className="min-h-screen overflow-hidden bg-[#f5f5f5] p-3.5 flex justify-center pt-20 pb-4">
+      <div className="min-h-screen overflow-hidden bg-[#f5f5f5] p-3.5 flex justify-center pt-32 pb-4">
         <div className="mx-auto w-full max-w-6xl">
           <div className="grid gap-3 md:grid-cols-3">
             {/* Event Information */}

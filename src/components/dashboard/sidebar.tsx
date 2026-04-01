@@ -8,6 +8,7 @@ import {
   Calendar,
   CalendarDays,
   GitBranch,
+  Settings,
   Share2,
   TrendingUp,
 } from "lucide-react";
@@ -37,6 +38,11 @@ const menuItems = [
     label: "Insight",
     href: "/insight",
     icon: TrendingUp,
+  },
+  {
+    label: "Account",
+    href: "/account",
+    icon: Settings,
   },
 ];
 

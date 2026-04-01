@@ -87,6 +87,46 @@ export const createAccount = createServerFn({ method: "POST" })
     return result[0] as Account;
   });
 
+export const updateAccount = createServerFn({ method: "POST" })
+  .inputValidator(
+    (data: { walletAddress: string } & Partial<AccountInput>) => data
+  )
+  .handler(async ({ data }) => {
+    const walletAddress = data.walletAddress;
+    const updates = data as Partial<AccountInput>;
+
+    const existing = await db
+      .select()
+      .from(accounts)
+      .where(eq(accounts.walletAddress, walletAddress))
+      .get();
+
+    if (!existing) {
+      throw new Error("Account not found");
+    }
+
+    if (updates.username && updates.username !== existing.username) {
+      const usernameCheck = await db
+        .select()
+        .from(accounts)
+        .where(eq(accounts.username, updates.username))
+        .get();
+
+      if (usernameCheck) {
+        throw new Error("Username already taken");
+      }
+    }
+
+    const now = new Date();
+    const result = await db
+      .update(accounts)
+      .set({ ...updates, updatedAt: now })
+      .where(eq(accounts.walletAddress, walletAddress))
+      .returning();
+
+    return result[0] as Account;
+  });
+
 export type EventTypeInput = Omit<EventType, "id" | "createdAt" | "updatedAt">;
 
 export const getEventTypes = createServerFn({ method: "GET" })

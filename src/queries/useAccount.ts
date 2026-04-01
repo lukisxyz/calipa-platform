@@ -4,6 +4,7 @@ import {
   accountExists,
   getAccountByUsername,
   createAccount,
+  updateAccount,
 } from "@/lib/server/functions";
 import type { AccountInput } from "@/lib/db/schema";
 
@@ -39,6 +40,20 @@ export function useCreateAccount() {
 
   return useMutation({
     mutationFn: (data: AccountInput) => createAccount({ data }),
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: ["account", variables.walletAddress],
+      });
+    },
+  });
+}
+
+export function useUpdateAccount() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (data: { walletAddress: string } & Partial<AccountInput>) =>
+      updateAccount({ data }),
     onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({
         queryKey: ["account", variables.walletAddress],
