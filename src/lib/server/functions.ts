@@ -64,14 +64,17 @@ export const createAccount = createServerFn({ method: "POST" })
       throw new Error("Account already exists");
     }
 
-    const usernameExists = await db
-      .select()
-      .from(accounts)
-      .where(eq(accounts.username, data.username))
-      .get();
+    // Only check username uniqueness if username is provided
+    if (data.username) {
+      const usernameExists = await db
+        .select()
+        .from(accounts)
+        .where(eq(accounts.username, data.username))
+        .get();
 
-    if (usernameExists) {
-      throw new Error("Username already taken");
+      if (usernameExists) {
+        throw new Error("Username already taken");
+      }
     }
 
     const now = new Date();
@@ -79,6 +82,8 @@ export const createAccount = createServerFn({ method: "POST" })
       .insert(accounts)
       .values({
         ...data,
+        role: data.role || "user",
+        isMentorApproved: data.isMentorApproved ?? false,
         createdAt: now,
         updatedAt: now,
       })
@@ -125,6 +130,26 @@ export const updateAccount = createServerFn({ method: "POST" })
       .returning();
 
     return result[0] as Account;
+  });
+
+// Check if user is a mentor (can create event types)
+export const checkIsMentor = createServerFn({ method: "GET" })
+  .inputValidator((data: { walletAddress: string }) => data)
+  .handler(async ({ data }) => {
+    const account = await db
+      .select()
+      .from(accounts)
+      .where(eq(accounts.walletAddress, data.walletAddress))
+      .get();
+
+    if (!account) {
+      return { isMentor: false, hasUsername: false };
+    }
+
+    return {
+      isMentor: account.role === "mentor",
+      hasUsername: !!account.username,
+    };
   });
 
 export type EventTypeInput = Omit<EventType, "id" | "createdAt" | "updatedAt">;
@@ -402,6 +427,117 @@ export const checkSlotAvailability = createServerFn({ method: "GET" })
     const seatsRemaining = Math.max(0, seatLimit - overlappingBookings.length);
 
     return { available, seatsRemaining, seatLimit };
+  });
+
+// Find account by email (for auto-fill when booking)
+export const getAccountByEmail = createServerFn({ method: "GET" })
+  .inputValidator((data: { email: string }) => data)
+  .handler(async ({ data }) => {
+    const account = await db
+      .select()
+      .from(accounts)
+      .where(eq(accounts.email, data.email))
+      .get();
+
+    return account as Account | null;
+  });
+
+// Create or update account from booking info
+export const createOrUpdateAccountFromBooking = createServerFn({
+  method: "POST",
+})
+  .inputValidator(
+    (data: {
+      walletAddress?: string | null;
+      name: string;
+      email: string;
+      timezone: string;
+    }) => data
+  )
+  .handler(async ({ data }) => {
+    const { walletAddress, name, email, timezone } = data;
+
+    // If wallet address provided, check if account exists by wallet
+    if (walletAddress) {
+      const existingByWallet = await db
+        .select()
+        .from(accounts)
+        .where(eq(accounts.walletAddress, walletAddress))
+        .get();
+
+      if (existingByWallet) {
+        // Update existing account with latest info
+        const now = new Date();
+        const result = await db
+          .update(accounts)
+          .set({
+            name,
+            email,
+            timezone,
+            updatedAt: now,
+          })
+          .where(eq(accounts.walletAddress, walletAddress))
+          .returning();
+
+        return result[0] as Account;
+      }
+    }
+
+    // If email provided, check if account exists by email
+    if (email) {
+      const existingByEmail = await db
+        .select()
+        .from(accounts)
+        .where(eq(accounts.email, email))
+        .get();
+
+      if (existingByEmail) {
+        // Update existing account - add wallet if not present
+        const now = new Date();
+
+        // Build update object with only defined fields
+        const updateFields: Record<string, unknown> = {
+          name,
+          timezone,
+          updatedAt: now,
+        };
+
+        // Only update email if wallet exists (to avoid overwriting wallet-bound email)
+        if (!walletAddress && !existingByEmail.walletAddress) {
+          updateFields.email = email;
+        }
+        // Add wallet if new and user has wallet
+        if (walletAddress && !existingByEmail.walletAddress) {
+          updateFields.walletAddress = walletAddress;
+        }
+
+        const result = await db
+          .update(accounts)
+          .set(updateFields)
+          .where(eq(accounts.email, email))
+          .returning();
+
+        return result[0] as Account;
+      }
+    }
+
+    // Create new account - no wallet needed for guest bookers
+    const now = new Date();
+    const result = await db
+      .insert(accounts)
+      .values({
+        walletAddress: walletAddress || `guest_${randomUUID()}`,
+        username: null,
+        name,
+        email,
+        timezone,
+        role: "user",
+        createdAt: now,
+        updatedAt: now,
+      })
+      .returning();
+
+    return result[0] as Account;
   });
 
 export const createBooking = createServerFn({ method: "POST" })

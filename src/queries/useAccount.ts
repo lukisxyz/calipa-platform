@@ -5,6 +5,9 @@ import {
   getAccountByUsername,
   createAccount,
   updateAccount,
+  getAccountByEmail,
+  createOrUpdateAccountFromBooking,
+  checkIsMentor,
 } from "@/lib/server/functions";
 import type { AccountInput } from "@/lib/db/schema";
 
@@ -35,6 +38,24 @@ export function useAccountByUsername(username: string | undefined) {
   });
 }
 
+export function useAccountByEmail(email: string | undefined) {
+  return useQuery({
+    queryKey: ["account-by-email", email],
+    queryFn: () => getAccountByEmail({ data: { email: email! } }),
+    enabled: !!email && email.length > 0,
+    retry: false,
+  });
+}
+
+export function useCheckIsMentor(walletAddress: string | undefined) {
+  return useQuery({
+    queryKey: ["check-is-mentor", walletAddress],
+    queryFn: () => checkIsMentor({ data: { walletAddress: walletAddress! } }),
+    enabled: !!walletAddress,
+    retry: false,
+  });
+}
+
 export function useCreateAccount() {
   const queryClient = useQueryClient();
 
@@ -58,6 +79,23 @@ export function useUpdateAccount() {
       queryClient.invalidateQueries({
         queryKey: ["account", variables.walletAddress],
       });
+    },
+  });
+}
+
+export function useCreateOrUpdateAccountFromBooking() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (data: {
+      walletAddress?: string | null;
+      name: string;
+      email: string;
+      timezone: string;
+    }) => createOrUpdateAccountFromBooking({ data }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["account"] });
+      queryClient.invalidateQueries({ queryKey: ["account-by-email"] });
     },
   });
 }

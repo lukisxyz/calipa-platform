@@ -2,12 +2,16 @@ import { sqliteTable, text, integer, index } from "drizzle-orm/sqlite-core";
 
 export const accounts = sqliteTable("accounts", {
   walletAddress: text("wallet_address").primaryKey(),
-  username: text("username").unique().notNull(),
+  username: text("username").unique(),
   name: text("name").notNull(),
-  email: text("email").notNull(),
+  email: text("email"),
   avatar: text("avatar"),
   bio: text("bio"),
   timezone: text("timezone").notNull().default("UTC"),
+  role: text("role").notNull().default("user"), // "user" | "mentor"
+  isMentorApproved: integer("is_mentor_approved", { mode: "boolean" }).default(
+    false
+  ),
   createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
   updatedAt: integer("updated_at", { mode: "timestamp" }).notNull(),
 });
@@ -102,10 +106,11 @@ export type NewBooking = typeof bookings.$inferInsert;
 export type Payment = typeof payments.$inferSelect;
 export type NewPayment = typeof payments.$inferInsert;
 
-export type AccountInput = Omit<
-  Account,
-  "createdAt" | "updatedAt" | "avatar"
-> & { avatar?: string | null };
+// Make all fields optional for input - server function handles defaults
+export type AccountInput = Partial<Omit<Account, "createdAt" | "updatedAt">> & {
+  walletAddress: string;
+  name: string;
+};
 
 export type EventTypeInput = {
   id?: string;

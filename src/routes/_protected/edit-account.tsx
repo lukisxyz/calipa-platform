@@ -90,9 +90,9 @@ function EditAccountPage() {
 
   useEffect(() => {
     if (account) {
-      form.setFieldValue("username", account.username);
+      form.setFieldValue("username", account.username || "");
       form.setFieldValue("name", account.name);
-      form.setFieldValue("email", account.email);
+      form.setFieldValue("email", account.email || "");
       form.setFieldValue("timezone", account.timezone);
       form.setFieldValue("bio", account.bio || "");
     }

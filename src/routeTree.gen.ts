@@ -13,6 +13,7 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as CreateAccountRouteImport } from './routes/create-account'
 import { Route as ProtectedRouteImport } from './routes/_protected'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as BookingsBookingIdRouteImport } from './routes/bookings.$bookingId'
 import { Route as ProtectedWorkflowsRouteImport } from './routes/_protected/workflows'
 import { Route as ProtectedRoutingRouteImport } from './routes/_protected/routing'
 import { Route as ProtectedInsightRouteImport } from './routes/_protected/insight'
@@ -42,6 +43,11 @@ const ProtectedRoute = ProtectedRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BookingsBookingIdRoute = BookingsBookingIdRouteImport.update({
+  id: '/bookings/$bookingId',
+  path: '/bookings/$bookingId',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProtectedWorkflowsRoute = ProtectedWorkflowsRouteImport.update({
@@ -114,6 +120,7 @@ export interface FileRoutesByFullPath {
   '/insight': typeof ProtectedInsightRoute
   '/routing': typeof ProtectedRoutingRoute
   '/workflows': typeof ProtectedWorkflowsRoute
+  '/bookings/$bookingId': typeof BookingsBookingIdRoute
   '/event-types/create': typeof ProtectedEventTypesCreateRoute
   '/e/$username/$slug': typeof EUsernameSlugRoute
   '/event-types/': typeof ProtectedEventTypesIndexRoute
@@ -130,6 +137,7 @@ export interface FileRoutesByTo {
   '/insight': typeof ProtectedInsightRoute
   '/routing': typeof ProtectedRoutingRoute
   '/workflows': typeof ProtectedWorkflowsRoute
+  '/bookings/$bookingId': typeof BookingsBookingIdRoute
   '/event-types/create': typeof ProtectedEventTypesCreateRoute
   '/e/$username/$slug': typeof EUsernameSlugRoute
   '/event-types': typeof ProtectedEventTypesIndexRoute
@@ -148,6 +156,7 @@ export interface FileRoutesById {
   '/_protected/insight': typeof ProtectedInsightRoute
   '/_protected/routing': typeof ProtectedRoutingRoute
   '/_protected/workflows': typeof ProtectedWorkflowsRoute
+  '/bookings/$bookingId': typeof BookingsBookingIdRoute
   '/_protected/event-types/create': typeof ProtectedEventTypesCreateRoute
   '/e/$username/$slug': typeof EUsernameSlugRoute
   '/_protected/event-types/': typeof ProtectedEventTypesIndexRoute
@@ -166,6 +175,7 @@ export interface FileRouteTypes {
     | '/insight'
     | '/routing'
     | '/workflows'
+    | '/bookings/$bookingId'
     | '/event-types/create'
     | '/e/$username/$slug'
     | '/event-types/'
@@ -182,6 +192,7 @@ export interface FileRouteTypes {
     | '/insight'
     | '/routing'
     | '/workflows'
+    | '/bookings/$bookingId'
     | '/event-types/create'
     | '/e/$username/$slug'
     | '/event-types'
@@ -199,6 +210,7 @@ export interface FileRouteTypes {
     | '/_protected/insight'
     | '/_protected/routing'
     | '/_protected/workflows'
+    | '/bookings/$bookingId'
     | '/_protected/event-types/create'
     | '/e/$username/$slug'
     | '/_protected/event-types/'
@@ -211,6 +223,7 @@ export interface RootRouteChildren {
   ProtectedRoute: typeof ProtectedRouteWithChildren
   CreateAccountRoute: typeof CreateAccountRoute
   LoginRoute: typeof LoginRoute
+  BookingsBookingIdRoute: typeof BookingsBookingIdRoute
   EUsernameSlugRoute: typeof EUsernameSlugRoute
 }
 
@@ -242,6 +255,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/bookings/$bookingId': {
+      id: '/bookings/$bookingId'
+      path: '/bookings/$bookingId'
+      fullPath: '/bookings/$bookingId'
+      preLoaderRoute: typeof BookingsBookingIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_protected/workflows': {
@@ -361,6 +381,7 @@ const rootRouteChildren: RootRouteChildren = {
   ProtectedRoute: ProtectedRouteWithChildren,
   CreateAccountRoute: CreateAccountRoute,
   LoginRoute: LoginRoute,
+  BookingsBookingIdRoute: BookingsBookingIdRoute,
   EUsernameSlugRoute: EUsernameSlugRoute,
 }
 export const routeTree = rootRouteImport

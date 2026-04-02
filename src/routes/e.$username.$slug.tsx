@@ -1,13 +1,19 @@
 "use client";
 
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEventTypeByUsernameAndSlug } from "@/queries/useEventTypes";
-import { useAccountByUsername } from "@/queries/useAccount";
+import {
+  useAccountByUsername,
+  useAccountByEmail,
+  useCreateOrUpdateAccountFromBooking,
+} from "@/queries/useAccount";
+import { useCreateBooking } from "@/queries/useBookings";
 import { useMentorFee, useBookSession } from "@/hooks/useCalipaScheduling";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { TimezoneSelect } from "@/components/ui/timezone-select";
 import {
   Dialog,
   DialogContent,
@@ -17,16 +23,14 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { useForm } from "@tanstack/react-form";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Calendar } from "@/components/ui/calendar";
 import * as v from "valibot";
 import { cn } from "@/lib/utils";
 import { addDays, isBefore, startOfDay } from "date-fns";
 import {
-  Check,
   Calendar as CalendarIcon,
   Clock,
-  Globe,
   Wallet,
   LogOut,
   DollarSign,
@@ -127,12 +131,20 @@ function BookingPage() {
     account?.walletAddress
   );
   const bookSession = useBookSession();
+  const createOrUpdateAccount = useCreateOrUpdateAccountFromBooking();
+  const createBooking = useCreateBooking();
+  const navigate = useNavigate();
+
+  // Track email to look up existing account
+  const [currentEmail, setCurrentEmail] = useState("");
+  const { data: existingAccount } = useAccountByEmail(
+    currentEmail || undefined
+  );
 
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
   const [showModal, setShowModal] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState(false);
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
 
   const form = useForm({
@@ -186,19 +198,41 @@ function BookingPage() {
           await bookSession.bookSession(account!.walletAddress, timestamp);
         }
 
-        // Log booking details (in production, this would call an API)
-        console.log("Booking submitted:", {
-          ...value,
-          date: selectedDate,
-          time: selectedTime,
-          eventTypeId: eventType?.id,
-          priceType,
-          price: eventType?.price,
-          tip: value.tip,
+        // Save/create account from booking info
+        await createOrUpdateAccount.mutateAsync({
+          walletAddress: walletAddress || null,
+          name: value.name,
+          email: value.email,
+          timezone: value.timezone,
         });
 
-        setSuccess(true);
-        setShowModal(false);
+        // Calculate start and end times
+        const startTime = new Date(
+          selectedDate!.toISOString().split("T")[0] + "T" + selectedTime + ":00"
+        );
+        const endTime = new Date(
+          startTime.getTime() + (eventType?.duration || 30) * 60 * 1000
+        );
+
+        // Create the booking
+        const bookingResult = await createBooking.mutateAsync({
+          eventTypeId: eventType!.id,
+          hostAccountId: account!.walletAddress,
+          bookerName: value.name,
+          bookerEmail: value.email,
+          bookerTimezone: value.timezone,
+          bookerWalletAddress: walletAddress || null,
+          notes: value.notes || null,
+          startTime,
+          endTime,
+        });
+
+        // Redirect to booking receipt
+        navigate({
+          to: "/bookings/$bookingId",
+          params: { bookingId: bookingResult.id },
+          viewTransition: true,
+        });
       } catch (e: unknown) {
         setError(e instanceof Error ? e.message : "Failed to process booking");
       } finally {
@@ -206,6 +240,25 @@ function BookingPage() {
       }
     },
   });
+
+  // Auto-fill form when existing account is found by email
+  useEffect(() => {
+    if (existingAccount && currentEmail) {
+      form.setFieldValue("name", existingAccount.name || "");
+      form.setFieldValue(
+        "timezone",
+        existingAccount.timezone || form.state.values.timezone
+      );
+      // Only set wallet if user doesn't have one yet and existing has one
+      if (
+        !walletAddress &&
+        existingAccount.walletAddress &&
+        !existingAccount.walletAddress.startsWith("guest_")
+      ) {
+        form.setFieldValue("walletAddress", existingAccount.walletAddress);
+      }
+    }
+  }, [existingAccount, currentEmail, walletAddress]);
 
   if (accountLoading || eventTypeLoading) {
     return (
@@ -229,29 +282,6 @@ function BookingPage() {
             </h1>
             <p className="mt-2 text-slate-500">
               This event type does not exist or has been removed.
-            </p>
-          </div>
-        </div>
-      </>
-    );
-  }
-
-  if (success) {
-    return (
-      <>
-        <Header />
-        <div className="flex h-screen items-center justify-center px-4 pt-16">
-          <div className="w-full max-w-md text-center">
-            <div className="mx-auto mb-4 flex size-16 items-center justify-center rounded-full bg-green-100">
-              <Check className="size-8 text-green-600" />
-            </div>
-            <h1 className="text-2xl font-bold text-slate-900">
-              Booking Confirmed!
-            </h1>
-            <p className="mt-2 text-slate-500">
-              Your booking for {eventType.name} has been submitted.
-              {eventType.requiresConfirmation &&
-                " You'll receive a confirmation email."}
             </p>
           </div>
         </div>
@@ -537,7 +567,10 @@ function BookingPage() {
                         type="email"
                         value={field.state.value}
                         onChange={(e) => field.handleChange(e.target.value)}
-                        onBlur={field.handleBlur}
+                        onBlur={(e) => {
+                          field.handleBlur();
+                          setCurrentEmail(e.target.value);
+                        }}
                         placeholder="your@email.com"
                       />
                       {field.state.meta.errors && (
@@ -558,17 +591,14 @@ function BookingPage() {
                         className="text-sm font-medium"
                       >
                         <span className="flex items-center gap-1">
-                          <Globe className="size-3" />
                           Timezone *
                         </span>
                       </Label>
-                      <Input
-                        id={field.name}
-                        name={field.name}
+                      <TimezoneSelect
                         value={field.state.value}
-                        onChange={(e) => field.handleChange(e.target.value)}
-                        onBlur={field.handleBlur}
-                        placeholder="Your timezone"
+                        onChange={(value) => field.handleChange(value)}
+                        placeholder="Select timezone"
+                        className="w-full"
                       />
                       {field.state.meta.errors && (
                         <p className="text-xs text-red-500">
