@@ -17,7 +17,13 @@ import {
 } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
-import { useState } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogTrigger,
+  DialogPortal,
+  DialogOverlay,
+} from "@/components/ui/dialog";
 
 export const Route = createFileRoute("/bookings/$bookingId")({
   component: BookingReceiptPage,
@@ -28,7 +34,6 @@ function BookingReceiptPage() {
   const { data: booking, isLoading } = useBookingById(bookingId);
   const { data: hostAccount } = useAccount(booking?.hostAccountId);
   const navigate = useNavigate();
-  const [showQr, setShowQr] = useState(false);
 
   if (isLoading) {
     return (
@@ -239,29 +244,31 @@ function BookingReceiptPage() {
                   </div>
 
                   {/* QR Code Section */}
-                  <button
-                    onClick={() => setShowQr(!showQr)}
-                    className="mt-6 relative group cursor-pointer"
-                  >
-                    <div className="size-32 bg-white rounded-lg p-2 transition-transform group-hover:scale-105 border border-stone-200">
-                      <div className="w-full h-full bg-white rounded overflow-hidden">
-                        <QrCode className="w-full h-full text-stone-800" />
-                      </div>
-                    </div>
-                    <div className="absolute -bottom-8 left-0 right-0 text-center text-xs text-stone-400 opacity-0 group-hover:opacity-100 transition-opacity">
-                      Tap to reveal
-                    </div>
-                  </button>
-
-                  {/* Show full QR when tapped */}
-                  {showQr && (
-                    <div className="mt-12 p-4 bg-white rounded-lg border border-stone-200">
-                      <QrCode className="size-40 text-stone-800" />
-                      <p className="text-xs text-stone-500 mt-2 font-mono text-center">
-                        {booking.id}
-                      </p>
-                    </div>
-                  )}
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <button className="mt-6 relative group cursor-pointer">
+                        <div className="size-32 bg-white rounded-lg p-2 transition-transform group-hover:scale-105 border border-stone-200">
+                          <div className="w-full h-full bg-white rounded overflow-hidden">
+                            <QrCode className="w-full h-full text-stone-800" />
+                          </div>
+                        </div>
+                        <div className="absolute -bottom-8 left-0 right-0 text-center text-xs text-stone-400 opacity-0 group-hover:opacity-100 transition-opacity">
+                          Tap to reveal
+                        </div>
+                      </button>
+                    </DialogTrigger>
+                    <DialogPortal>
+                      <DialogOverlay className="bg-black/60 backdrop-blur-sm" />
+                      <DialogContent className="max-w-sm sm:max-w-md">
+                        <div className="flex flex-col items-center p-4">
+                          <QrCode className="size-48 text-stone-800 mb-4" />
+                          <p className="text-xs text-stone-500 font-mono text-center break-all px-2">
+                            {booking.id}
+                          </p>
+                        </div>
+                      </DialogContent>
+                    </DialogPortal>
+                  </Dialog>
 
                   {/* Wallet Address */}
                   {booking.bookerWalletAddress && (
@@ -301,17 +308,6 @@ function BookingReceiptPage() {
             <div className="size-4 bg-white rounded-full border border-stone-500" />
             <div className="size-4 bg-white rounded-full border border-stone-500 mt-12" />
           </div>
-        </div>
-
-        {/* Actions */}
-        <div className="mt-8 flex justify-center gap-4">
-          <Button
-            variant="outline"
-            onClick={() => navigate({ to: "/" })}
-            className="border-stone-300 text-stone-600 hover:text-stone-800 hover:bg-stone-100"
-          >
-            Back to Home
-          </Button>
         </div>
       </div>
     </div>
