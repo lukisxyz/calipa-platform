@@ -350,16 +350,24 @@ export const deleteEventType = createServerFn({ method: "POST" })
     return { success: true };
   });
 
+export type BookingWithEventType = Booking & {
+  eventTypeName: string | null;
+};
+
 export const getBookingsByHost = createServerFn({ method: "GET" })
   .inputValidator((data: { hostAccountId: string }) => data)
   .handler(async ({ data }) => {
     const result = await db
       .select()
       .from(bookings)
+      .leftJoin(eventTypes, eq(bookings.eventTypeId, eventTypes.id))
       .where(eq(bookings.hostAccountId, data.hostAccountId))
       .orderBy(bookings.startTime);
 
-    return result as Booking[];
+    return result.map((row) => ({
+      ...row.bookings,
+      eventTypeName: row.event_types?.name ?? null,
+    })) as BookingWithEventType[];
   });
 
 export const getBookingsByEventType = createServerFn({ method: "GET" })

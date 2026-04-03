@@ -7,7 +7,11 @@ import {
   useAccountByEmail,
   useCreateOrUpdateAccountFromBooking,
 } from "@/queries/useAccount";
-import { useCreateBooking } from "@/queries/useBookings";
+import {
+  useCreateBooking,
+  useBookingsByEventType,
+} from "@/queries/useBookings";
+import { checkSlotAvailability } from "@/lib/server/functions";
 import { useMentorFee, useBookSession } from "@/hooks/useCalipaScheduling";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -133,6 +137,7 @@ function BookingPage() {
   const bookSession = useBookSession();
   const createOrUpdateAccount = useCreateOrUpdateAccountFromBooking();
   const createBooking = useCreateBooking();
+  const { data: existingBookings } = useBookingsByEventType(eventType?.id);
   const navigate = useNavigate();
 
   // Track email to look up existing account
@@ -146,6 +151,7 @@ function BookingPage() {
   const [showModal, setShowModal] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
+  const [slotUnavailable, setSlotUnavailable] = useState<string | null>(null);
 
   const form = useForm({
     defaultValues: {
@@ -176,6 +182,31 @@ function BookingPage() {
         !walletAddress
       ) {
         setError("Please connect your wallet to book this event");
+        return;
+      }
+
+      // Check slot availability before booking
+      const startTime = new Date(
+        selectedDate!.toISOString().split("T")[0] + "T" + selectedTime + ":00"
+      );
+      const endTime = new Date(
+        startTime.getTime() + (eventType?.duration || 30) * 60 * 1000
+      );
+
+      const availability = await checkSlotAvailability({
+        data: {
+          eventTypeId: eventType!.id,
+          startTime,
+          endTime,
+        },
+      });
+
+      if (!availability.available) {
+        setError(
+          `This slot is no longer available. Only ${availability.seatsRemaining} seat(s) remaining. Please choose another time.`
+        );
+        setSlotUnavailable(selectedTime);
+        setShowModal(false);
         return;
       }
 
@@ -313,8 +344,40 @@ function BookingPage() {
     eventType.bufferTime ?? 0
   );
 
+  // Calculate slot availability based on seat limit
+  const seatLimit = eventType.seatLimit ?? 1;
+  const isSlotBooked = (time: string) => {
+    if (!selectedDate || !existingBookings) return false;
+    const slotStart = new Date(
+      selectedDate.toISOString().split("T")[0] + "T" + time + ":00"
+    );
+    const slotEnd = new Date(
+      slotStart.getTime() + eventType.duration * 60 * 1000
+    );
+
+    // Count bookings that overlap with this slot
+    const conflictStatus = eventType.requiresConfirmation
+      ? ["pending", "confirmed"]
+      : ["confirmed"];
+
+    const overlapping = existingBookings.filter((booking) => {
+      if (!conflictStatus.includes(booking.status)) return false;
+      const bookingStart = new Date(booking.startTime);
+      const bookingEnd = new Date(booking.endTime);
+      return bookingStart < slotEnd && bookingEnd > slotStart;
+    });
+
+    return overlapping.length >= seatLimit;
+  };
+
   const handleTimeSelect = (time: string) => {
+    // Check availability before showing modal
+    if (isSlotBooked(time)) {
+      setSlotUnavailable(time);
+      return;
+    }
     setSelectedTime(time);
+    setSlotUnavailable(null);
     setShowModal(true);
   };
 
@@ -482,24 +545,39 @@ function BookingPage() {
                   Select Time
                 </span>
               </h2>
+              {slotUnavailable && (
+                <div className="mb-3 rounded-md bg-red-50 border border-red-200 p-3">
+                  <p className="text-sm text-red-600 font-medium">
+                    This time slot is fully booked (quota reached).
+                  </p>
+                  <p className="text-xs text-red-500 mt-1">
+                    Please choose another time.
+                  </p>
+                </div>
+              )}
               {selectedDate ? (
                 <div className="grid grid-cols-2 gap-1.5">
-                  {timeSlots.map((time) => (
-                    <button
-                      key={time}
-                      type="button"
-                      onClick={() => handleTimeSelect(time)}
-                      disabled={selectedTime === time}
-                      className={cn(
-                        "rounded border px-2 py-1.5 text-sm font-medium transition-colors",
-                        selectedTime === time
-                          ? "border-[#292929] bg-[#292929] text-white"
-                          : "border-slate-200 text-slate-600 hover:border-slate-300 hover:bg-slate-50"
-                      )}
-                    >
-                      {time}
-                    </button>
-                  ))}
+                  {timeSlots.map((time) => {
+                    const booked = isSlotBooked(time);
+                    return (
+                      <button
+                        key={time}
+                        type="button"
+                        onClick={() => handleTimeSelect(time)}
+                        disabled={selectedTime === time || booked}
+                        className={cn(
+                          "rounded border px-2 py-1.5 text-sm font-medium transition-colors",
+                          selectedTime === time
+                            ? "border-[#292929] bg-[#292929] text-white"
+                            : booked
+                              ? "border-red-200 bg-red-50 text-red-400 cursor-not-allowed"
+                              : "border-slate-200 text-slate-600 hover:border-slate-300 hover:bg-slate-50"
+                        )}
+                      >
+                        {time}
+                      </button>
+                    );
+                  })}
                 </div>
               ) : (
                 <p className="text-sm text-slate-500">Select a date first</p>
