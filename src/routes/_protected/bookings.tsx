@@ -55,7 +55,7 @@ function BookingsPage() {
 
   if (isLoadingAccount || isLoadingBookings) {
     return (
-      <div className="rounded-lg border border-slate-200 bg-white p-6">
+      <div className="rounded-lg border border-slate-200 bg-white p-4 sm:p-6">
         <div className="mb-6">
           <h1 className="text-2xl font-bold text-slate-900 mb-2">Bookings</h1>
           <p className="text-slate-600">View all your scheduled bookings</p>
@@ -68,7 +68,7 @@ function BookingsPage() {
   }
 
   return (
-    <div className="rounded-lg border border-slate-200 bg-white p-6">
+    <div className="rounded-lg border border-slate-200 bg-white p-4 sm:p-6">
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-slate-900 mb-2">Bookings</h1>
         <p className="text-slate-600">View all your scheduled bookings</p>

@@ -26,82 +26,80 @@ function AccountPage() {
     useAccount(initiaAddress);
 
   return (
-    <div className="container mx-auto py-10 max-w-2xl">
-      <div className="space-y-8">
-        {/* Account Information Section */}
-        <Card>
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <div>
-                <CardTitle>Account Information</CardTitle>
-                <CardDescription>
-                  View and manage your account details
-                </CardDescription>
+    <div className="space-y-8">
+      {/* Account Information Section */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle>Account Information</CardTitle>
+              <CardDescription>
+                View and manage your account details
+              </CardDescription>
+            </div>
+            {account && (
+              <Button variant="outline">
+                <Link to="/edit-account">Edit</Link>
+              </Button>
+            )}
+          </div>
+        </CardHeader>
+        <CardContent>
+          {isLoadingAccount ? (
+            <p className="text-muted-foreground">Loading...</p>
+          ) : isLoadingExists ? (
+            <p className="text-muted-foreground">Loading...</p>
+          ) : !accountExists ? (
+            <div className="space-y-4">
+              <p className="text-muted-foreground">
+                You haven&apos;t created an account yet. Create one to start
+                accepting bookings.
+              </p>
+              <Button>
+                <Link to="/create-account">Create Account</Link>
+              </Button>
+            </div>
+          ) : account ? (
+            <div className="grid gap-4 grid-cols-1 sm:grid-cols-2">
+              <div className="space-y-1">
+                <p className="text-sm font-medium text-muted-foreground">
+                  Username
+                </p>
+                <p className="text-lg font-semibold">@{account.username}</p>
               </div>
-              {account && (
-                <Button variant="outline">
-                  <Link to="/edit-account">Edit</Link>
-                </Button>
+              <div className="space-y-1">
+                <p className="text-sm font-medium text-muted-foreground">
+                  Name
+                </p>
+                <p className="text-lg font-semibold">{account.name}</p>
+              </div>
+              <div className="space-y-1">
+                <p className="text-sm font-medium text-muted-foreground">
+                  Email
+                </p>
+                <p className="text-lg font-semibold">{account.email}</p>
+              </div>
+              <div className="space-y-1">
+                <p className="text-sm font-medium text-muted-foreground">
+                  Timezone
+                </p>
+                <p className="text-lg font-semibold">{account.timezone}</p>
+              </div>
+              {account.bio && (
+                <div className="space-y-1 md:col-span-2">
+                  <p className="text-sm font-medium text-muted-foreground">
+                    Bio
+                  </p>
+                  <p className="text-sm">{account.bio}</p>
+                </div>
               )}
             </div>
-          </CardHeader>
-          <CardContent>
-            {isLoadingAccount ? (
-              <p className="text-muted-foreground">Loading...</p>
-            ) : isLoadingExists ? (
-              <p className="text-muted-foreground">Loading...</p>
-            ) : !accountExists ? (
-              <div className="space-y-4">
-                <p className="text-muted-foreground">
-                  You haven&apos;t created an account yet. Create one to start
-                  accepting bookings.
-                </p>
-                <Button>
-                  <Link to="/create-account">Create Account</Link>
-                </Button>
-              </div>
-            ) : account ? (
-              <div className="grid gap-4 md:grid-cols-2">
-                <div className="space-y-1">
-                  <p className="text-sm font-medium text-muted-foreground">
-                    Username
-                  </p>
-                  <p className="text-lg font-semibold">@{account.username}</p>
-                </div>
-                <div className="space-y-1">
-                  <p className="text-sm font-medium text-muted-foreground">
-                    Name
-                  </p>
-                  <p className="text-lg font-semibold">{account.name}</p>
-                </div>
-                <div className="space-y-1">
-                  <p className="text-sm font-medium text-muted-foreground">
-                    Email
-                  </p>
-                  <p className="text-lg font-semibold">{account.email}</p>
-                </div>
-                <div className="space-y-1">
-                  <p className="text-sm font-medium text-muted-foreground">
-                    Timezone
-                  </p>
-                  <p className="text-lg font-semibold">{account.timezone}</p>
-                </div>
-                {account.bio && (
-                  <div className="space-y-1 md:col-span-2">
-                    <p className="text-sm font-medium text-muted-foreground">
-                      Bio
-                    </p>
-                    <p className="text-sm">{account.bio}</p>
-                  </div>
-                )}
-              </div>
-            ) : null}
-          </CardContent>
-        </Card>
+          ) : null}
+        </CardContent>
+      </Card>
 
-        {/* Mentor Fee Set Section */}
-        <MentorFeeSection />
-      </div>
+      {/* Mentor Fee Set Section */}
+      <MentorFeeSection />
     </div>
   );
 }

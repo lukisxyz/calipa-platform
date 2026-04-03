@@ -207,7 +207,7 @@ function CreateEventTypePage() {
   }
 
   return (
-    <div className="mx-auto max-w-2xl space-y-6">
+    <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold text-slate-900">Create Event Type</h1>
         <p className="mt-1 text-sm text-slate-500">
@@ -552,7 +552,7 @@ function CreateEventTypePage() {
               <form.Field
                 name="priceType"
                 children={(field) => (
-                  <div className="grid grid-cols-3 gap-2">
+                  <div className="grid gap-2 grid-cols-1 sm:grid-cols-3">
                     <button
                       type="button"
                       onClick={() => field.handleChange("free")}

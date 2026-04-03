@@ -111,137 +111,135 @@ function EditAccountPage() {
   }
 
   return (
-    <div className="container mx-auto py-10 max-w-md">
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold">Edit Account</h1>
-          <Button variant="ghost" size="sm">
-            <Link to="/account">Cancel</Link>
-          </Button>
-        </div>
-
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            form.handleSubmit();
-          }}
-          className="space-y-4"
-        >
-          <form.Field
-            name="username"
-            children={(field) => (
-              <div className="space-y-2">
-                <Label htmlFor={field.name}>Username</Label>
-                <Input
-                  id={field.name}
-                  name={field.name}
-                  value={field.state.value}
-                  onChange={(e) => field.handleChange(e.target.value)}
-                  onBlur={field.handleBlur}
-                  placeholder="johndoe"
-                />
-                {field.state.meta.errors && (
-                  <p className="text-xs text-red-500">
-                    {field.state.meta.errors[0]}
-                  </p>
-                )}
-              </div>
-            )}
-          />
-
-          <form.Field
-            name="name"
-            children={(field) => (
-              <div className="space-y-2">
-                <Label htmlFor={field.name}>Full Name</Label>
-                <Input
-                  id={field.name}
-                  name={field.name}
-                  value={field.state.value}
-                  onChange={(e) => field.handleChange(e.target.value)}
-                  onBlur={field.handleBlur}
-                  placeholder="John Doe"
-                />
-                {field.state.meta.errors && (
-                  <p className="text-xs text-red-500">
-                    {field.state.meta.errors[0]}
-                  </p>
-                )}
-              </div>
-            )}
-          />
-
-          <form.Field
-            name="email"
-            children={(field) => (
-              <div className="space-y-2">
-                <Label htmlFor={field.name}>Email</Label>
-                <Input
-                  id={field.name}
-                  name={field.name}
-                  type="email"
-                  value={field.state.value}
-                  onChange={(e) => field.handleChange(e.target.value)}
-                  onBlur={field.handleBlur}
-                  placeholder="john@example.com"
-                />
-                {field.state.meta.errors && (
-                  <p className="text-xs text-red-500">
-                    {field.state.meta.errors[0]}
-                  </p>
-                )}
-              </div>
-            )}
-          />
-
-          <form.Field
-            name="timezone"
-            children={(field) => (
-              <div className="space-y-2">
-                <Label htmlFor={field.name}>Timezone</Label>
-                <TimezoneSelect
-                  value={field.state.value}
-                  onChange={(value) => field.handleChange(value)}
-                  placeholder="Select your timezone"
-                />
-                {field.state.meta.errors && (
-                  <p className="text-xs text-red-500">
-                    {field.state.meta.errors[0]}
-                  </p>
-                )}
-              </div>
-            )}
-          />
-
-          <form.Field
-            name="bio"
-            children={(field) => (
-              <div className="space-y-2">
-                <Label htmlFor={field.name}>Bio (optional)</Label>
-                <Textarea
-                  id={field.name}
-                  name={field.name}
-                  value={field.state.value}
-                  onChange={(e) => field.handleChange(e.target.value)}
-                  onBlur={field.handleBlur}
-                  placeholder="Tell people about yourself..."
-                  rows={3}
-                />
-              </div>
-            )}
-          />
-
-          {error && <p className="text-sm text-red-500">{error}</p>}
-
-          <Button
-            type="submit"
-            className="w-full"
-            disabled={updateAccount.isPending}
-          >
-            {updateAccount.isPending ? "Saving..." : "Save Changes"}
-          </Button>
-        </form>
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-bold">Edit Account</h1>
+        <Button variant="ghost" size="sm">
+          <Link to="/account">Cancel</Link>
+        </Button>
       </div>
+
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          form.handleSubmit();
+        }}
+        className="space-y-4"
+      >
+        <form.Field
+          name="username"
+          children={(field) => (
+            <div className="space-y-2">
+              <Label htmlFor={field.name}>Username</Label>
+              <Input
+                id={field.name}
+                name={field.name}
+                value={field.state.value}
+                onChange={(e) => field.handleChange(e.target.value)}
+                onBlur={field.handleBlur}
+                placeholder="johndoe"
+              />
+              {field.state.meta.errors && (
+                <p className="text-xs text-red-500">
+                  {field.state.meta.errors[0]}
+                </p>
+              )}
+            </div>
+          )}
+        />
+
+        <form.Field
+          name="name"
+          children={(field) => (
+            <div className="space-y-2">
+              <Label htmlFor={field.name}>Full Name</Label>
+              <Input
+                id={field.name}
+                name={field.name}
+                value={field.state.value}
+                onChange={(e) => field.handleChange(e.target.value)}
+                onBlur={field.handleBlur}
+                placeholder="John Doe"
+              />
+              {field.state.meta.errors && (
+                <p className="text-xs text-red-500">
+                  {field.state.meta.errors[0]}
+                </p>
+              )}
+            </div>
+          )}
+        />
+
+        <form.Field
+          name="email"
+          children={(field) => (
+            <div className="space-y-2">
+              <Label htmlFor={field.name}>Email</Label>
+              <Input
+                id={field.name}
+                name={field.name}
+                type="email"
+                value={field.state.value}
+                onChange={(e) => field.handleChange(e.target.value)}
+                onBlur={field.handleBlur}
+                placeholder="john@example.com"
+              />
+              {field.state.meta.errors && (
+                <p className="text-xs text-red-500">
+                  {field.state.meta.errors[0]}
+                </p>
+              )}
+            </div>
+          )}
+        />
+
+        <form.Field
+          name="timezone"
+          children={(field) => (
+            <div className="space-y-2">
+              <Label htmlFor={field.name}>Timezone</Label>
+              <TimezoneSelect
+                value={field.state.value}
+                onChange={(value) => field.handleChange(value)}
+                placeholder="Select your timezone"
+              />
+              {field.state.meta.errors && (
+                <p className="text-xs text-red-500">
+                  {field.state.meta.errors[0]}
+                </p>
+              )}
+            </div>
+          )}
+        />
+
+        <form.Field
+          name="bio"
+          children={(field) => (
+            <div className="space-y-2">
+              <Label htmlFor={field.name}>Bio (optional)</Label>
+              <Textarea
+                id={field.name}
+                name={field.name}
+                value={field.state.value}
+                onChange={(e) => field.handleChange(e.target.value)}
+                onBlur={field.handleBlur}
+                placeholder="Tell people about yourself..."
+                rows={3}
+              />
+            </div>
+          )}
+        />
+
+        {error && <p className="text-sm text-red-500">{error}</p>}
+
+        <Button
+          type="submit"
+          className="w-full"
+          disabled={updateAccount.isPending}
+        >
+          {updateAccount.isPending ? "Saving..." : "Save Changes"}
+        </Button>
+      </form>
     </div>
   );
 }

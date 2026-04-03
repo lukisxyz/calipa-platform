@@ -11,6 +11,7 @@ import {
   Settings,
   Share2,
   TrendingUp,
+  X,
 } from "lucide-react";
 
 const menuItems = [
@@ -46,13 +47,25 @@ const menuItems = [
   },
 ];
 
-export function DashboardSidebar() {
+interface DashboardSidebarProps {
+  onMenuClick?: () => void;
+}
+
+export function DashboardSidebar({ onMenuClick }: DashboardSidebarProps) {
   const { disconnect, initiaAddress, openWallet } = useInterwovenKit();
   const location = useLocation();
 
   return (
     <aside className="flex h-full w-64 flex-col border-r border-slate-200 bg-white py-3.5">
-      <div className="px-4 pb-3.5">
+      <div className="px-4 pb-3.5 flex items-center gap-2">
+        {onMenuClick && (
+          <button
+            onClick={onMenuClick}
+            className="p-1.5 -ml-1.5 rounded-md hover:bg-slate-100 lg:hidden"
+          >
+            <X className="size-5 text-slate-600" />
+          </button>
+        )}
         <Link to="/" viewTransition className="flex items-center gap-2 px-2">
           <img src="/favicon-32x32.png" alt="Calipa" className="size-6" />
           <span className="text-xl font-black text-slate-800">Calipa</span>

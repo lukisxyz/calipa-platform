@@ -19,7 +19,7 @@ function EventTypesPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between flex-col sm:flex-row gap-4 sm:gap-0">
         <div>
           <h1 className="text-2xl font-bold text-slate-900">Event Types</h1>
           <p className="mt-1 text-sm text-slate-500">

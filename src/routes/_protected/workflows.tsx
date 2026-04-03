@@ -6,7 +6,7 @@ export const Route = createFileRoute("/_protected/workflows")({
 
 function WorkflowsPage() {
   return (
-    <div className="rounded-lg border border-slate-200 bg-white p-8">
+    <div className="rounded-lg border border-slate-200 bg-white p-4 sm:p-6">
       <h1 className="text-2xl font-bold text-slate-900">Workflows</h1>
       <p className="mt-2 text-slate-600">Manage your workflows here.</p>
     </div>

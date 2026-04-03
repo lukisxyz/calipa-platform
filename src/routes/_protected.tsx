@@ -7,7 +7,7 @@ import {
 } from "@tanstack/react-router";
 import { useInterwovenKit } from "@initia/interwovenkit-react";
 import { ClientOnly } from "@tanstack/react-router";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { DashboardSidebar } from "@/components/dashboard/sidebar";
 import {
   Breadcrumb,
@@ -15,7 +15,7 @@ import {
   BreadcrumbLink,
   BreadcrumbPage,
 } from "@/components/ui/breadcrumb";
-import { ChevronRightIcon } from "lucide-react";
+import { ChevronRightIcon, Menu } from "lucide-react";
 
 const routeLabels: Record<string, string> = {
   "event-types": "Event Types",
@@ -32,6 +32,7 @@ function ProtectedContent() {
   const { initiaAddress } = useInterwovenKit();
   const navigate = useNavigate();
   const location = useLocation();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
     if (!initiaAddress) {
@@ -77,14 +78,37 @@ function ProtectedContent() {
 
   return (
     <div className="flex h-screen max-w-full overflow-hidden">
-      <DashboardSidebar />
+      {/* Mobile overlay */}
+      {sidebarOpen && (
+        <div
+          className="fixed inset-0 bg-black/50 z-30 lg:hidden"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
+      {/* Sidebar - slides in on mobile */}
+      <div
+        className={`fixed lg:relative inset-y-0 left-0 z-40 transform transition-transform duration-200 ease-in-out lg:transform-none ${
+          sidebarOpen ? "translate-x-0" : "-translate-x-full"
+        }`}
+      >
+        <DashboardSidebar onMenuClick={() => setSidebarOpen(!sidebarOpen)} />
+      </div>
+
       <div className="flex flex-1 flex-col overflow-hidden">
         <main
           id="main-content"
           tabIndex={0}
           className="flex-1 overflow-y-auto focus:outline-none"
         >
-          <div className="h-16 w-full mb-3.5 border-b flex items-center px-4">
+          {/* Mobile header with menu button */}
+          <div className="h-16 w-full mb-3.5 border-b flex items-center px-4 lg:px-6">
+            <button
+              onClick={() => setSidebarOpen(!sidebarOpen)}
+              className="p-2 -ml-2 mr-2 rounded-md hover:bg-slate-100 lg:hidden"
+            >
+              <Menu className="size-5 text-slate-600" />
+            </button>
             <Breadcrumb className="flex items-center gap-1">
               {breadcrumbs.map((crumb, index) => (
                 <React.Fragment key={crumb.path}>
@@ -109,7 +133,7 @@ function ProtectedContent() {
               ))}
             </Breadcrumb>
           </div>
-          <div className="mx-auto max-w-7xl px-3.5 py-7">
+          <div className="px-3.5 py-7 lg:px-6">
             <Outlet />
           </div>
         </main>
