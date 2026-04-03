@@ -10,6 +10,54 @@ import type {
   BookingInput,
 } from "@/lib/db/schema";
 import { randomUUID } from "crypto";
+import { RESTClient } from "@initia/initia.js";
+
+const INITIA_TESTNET_REST = "https://rest.testnet.initia.xyz";
+
+export const getBalance = createServerFn({ method: "GET" })
+  .inputValidator((data: { address: string }) => data)
+  .handler(async ({ data }) => {
+    try {
+      const response = await fetch(
+        `${INITIA_TESTNET_REST}/cosmos/bank/v1beta1/balances/${data.address}`
+      );
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+      return response.json();
+    } catch (error) {
+      console.warn("Failed to get balance:", error);
+      return { balances: [], pagination: { next_key: null } };
+    }
+  });
+
+export const resolveUsername = createServerFn({ method: "GET" })
+  .inputValidator((data: { address: string }) => data)
+  .handler(async ({ data }) => {
+    try {
+      const rest = new RESTClient(INITIA_TESTNET_REST, {
+        chainId: "initiation-2",
+      });
+
+      const address = data.address.startsWith("0x")
+        ? data.address
+        : data.address;
+
+      const response = await rest.move.viewJSON(
+        address,
+        "usernames",
+        "get_name_from_address",
+        [],
+        [`"${address}"`]
+      );
+
+      const parsed = JSON.parse(response.data);
+      return { name: parsed.name || null };
+    } catch (error) {
+      console.warn("Failed to resolve username:", error);
+      return { name: null };
+    }
+  });
 
 export const getAccount = createServerFn({ method: "GET" })
   .inputValidator((data: { walletAddress: string }) => data)
@@ -64,7 +112,6 @@ export const createAccount = createServerFn({ method: "POST" })
       throw new Error("Account already exists");
     }
 
-    // Only check username uniqueness if username is provided
     if (data.username) {
       const usernameExists = await db
         .select()
@@ -132,7 +179,6 @@ export const updateAccount = createServerFn({ method: "POST" })
     return result[0] as Account;
   });
 
-// Check if user is a mentor (can create event types)
 export const checkIsMentor = createServerFn({ method: "GET" })
   .inputValidator((data: { walletAddress: string }) => data)
   .handler(async ({ data }) => {
@@ -437,7 +483,6 @@ export const checkSlotAvailability = createServerFn({ method: "GET" })
     return { available, seatsRemaining, seatLimit };
   });
 
-// Find account by email (for auto-fill when booking)
 export const getAccountByEmail = createServerFn({ method: "GET" })
   .inputValidator((data: { email: string }) => data)
   .handler(async ({ data }) => {
@@ -450,7 +495,6 @@ export const getAccountByEmail = createServerFn({ method: "GET" })
     return account as Account | null;
   });
 
-// Create or update account from booking info
 export const createOrUpdateAccountFromBooking = createServerFn({
   method: "POST",
 })
@@ -465,7 +509,6 @@ export const createOrUpdateAccountFromBooking = createServerFn({
   .handler(async ({ data }) => {
     const { walletAddress, name, email, timezone } = data;
 
-    // If wallet address provided, check if account exists by wallet
     if (walletAddress) {
       const existingByWallet = await db
         .select()
@@ -474,7 +517,6 @@ export const createOrUpdateAccountFromBooking = createServerFn({
         .get();
 
       if (existingByWallet) {
-        // Update existing account with latest info
         const now = new Date();
         const result = await db
           .update(accounts)
@@ -491,7 +533,6 @@ export const createOrUpdateAccountFromBooking = createServerFn({
       }
     }
 
-    // If email provided, check if account exists by email
     if (email) {
       const existingByEmail = await db
         .select()
@@ -500,21 +541,17 @@ export const createOrUpdateAccountFromBooking = createServerFn({
         .get();
 
       if (existingByEmail) {
-        // Update existing account - add wallet if not present
         const now = new Date();
 
-        // Build update object with only defined fields
         const updateFields: Record<string, unknown> = {
           name,
           timezone,
           updatedAt: now,
         };
 
-        // Only update email if wallet exists (to avoid overwriting wallet-bound email)
         if (!walletAddress && !existingByEmail.walletAddress) {
           updateFields.email = email;
         }
-        // Add wallet if new and user has wallet
         if (walletAddress && !existingByEmail.walletAddress) {
           updateFields.walletAddress = walletAddress;
         }
@@ -529,7 +566,6 @@ export const createOrUpdateAccountFromBooking = createServerFn({
       }
     }
 
-    // Create new account - no wallet needed for guest bookers
     const now = new Date();
     const result = await db
       .insert(accounts)

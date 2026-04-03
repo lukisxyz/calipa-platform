@@ -7,7 +7,7 @@ import {
 } from "@tanstack/react-router";
 import { useInterwovenKit } from "@initia/interwovenkit-react";
 import { ClientOnly } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
 import { DashboardSidebar } from "@/components/dashboard/sidebar";
 import {
   Breadcrumb,
@@ -16,6 +16,19 @@ import {
   BreadcrumbPage,
 } from "@/components/ui/breadcrumb";
 import { ChevronRightIcon, Menu } from "lucide-react";
+
+function useMediaQuery(query: string) {
+  return useSyncExternalStore(
+    (callback) => {
+      const mediaQuery = window.matchMedia(query);
+      callback();
+      mediaQuery.addEventListener("change", callback);
+      return () => mediaQuery.removeEventListener("change", callback);
+    },
+    () => window.matchMedia(query).matches,
+    () => false
+  );
+}
 
 const routeLabels: Record<string, string> = {
   "event-types": "Event Types",
@@ -33,6 +46,14 @@ function ProtectedContent() {
   const navigate = useNavigate();
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const isDesktop = useMediaQuery("(min-width: 1024px)");
+
+  // Reset sidebar when switching to desktop view
+  useEffect(() => {
+    if (isDesktop) {
+      setSidebarOpen(false);
+    }
+  }, [isDesktop]);
 
   useEffect(() => {
     if (!initiaAddress) {
@@ -81,31 +102,36 @@ function ProtectedContent() {
       {/* Mobile overlay */}
       {sidebarOpen && (
         <div
-          className="fixed inset-0 bg-black/50 z-30 lg:hidden"
+          className="fixed inset-0 bg-black/50 z-30 sm:hidden"
           onClick={() => setSidebarOpen(false)}
         />
       )}
 
-      {/* Sidebar - slides in on mobile */}
-      <div
-        className={`fixed lg:relative inset-y-0 left-0 z-40 transform transition-transform duration-200 ease-in-out lg:transform-none ${
+      {/* Sidebar - always visible on desktop (sm+) */}
+      <aside className="hidden sm:flex sm:w-64 sm:flex-col sm:fixed sm:inset-y-0 sm:left-0 sm:z-40 sm:border-r sm:border-slate-200 sm:bg-white">
+        <DashboardSidebar onMenuClick={() => setSidebarOpen(!sidebarOpen)} />
+      </aside>
+
+      {/* Mobile sidebar - slides in/out */}
+      <aside
+        className={`fixed inset-y-0 left-0 z-40 w-64 transform transition-transform duration-200 ease-in-out sm:hidden ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
         <DashboardSidebar onMenuClick={() => setSidebarOpen(!sidebarOpen)} />
-      </div>
+      </aside>
 
       <div className="flex flex-1 flex-col overflow-hidden">
         <main
           id="main-content"
           tabIndex={0}
-          className="flex-1 overflow-y-auto focus:outline-none"
+          className="flex-1 overflow-y-auto focus:outline-none sm:pl-64"
         >
           {/* Mobile header with menu button */}
-          <div className="h-16 w-full mb-3.5 border-b flex items-center px-4 lg:px-6">
+          <div className="h-16 w-full mb-3.5 border-b flex items-center px-4 sm:px-6">
             <button
               onClick={() => setSidebarOpen(!sidebarOpen)}
-              className="p-2 -ml-2 mr-2 rounded-md hover:bg-slate-100 lg:hidden"
+              className="p-2 -ml-2 mr-2 rounded-md hover:bg-slate-100 sm:hidden"
             >
               <Menu className="size-5 text-slate-600" />
             </button>
@@ -133,7 +159,7 @@ function ProtectedContent() {
               ))}
             </Breadcrumb>
           </div>
-          <div className="px-3.5 py-7 lg:px-6">
+          <div className="px-3.5 py-7 sm:px-6">
             <Outlet />
           </div>
         </main>

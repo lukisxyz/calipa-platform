@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import {
   injectStyles,
   InterwovenKitProvider,
@@ -24,11 +24,18 @@ const wagmiConfig = createConfig({
 });
 
 export function Providers({ children }: { children: React.ReactNode }) {
+  const [mounted, setMounted] = useState(false);
+
   useEffect(() => {
+    setMounted(true);
     import("@initia/interwovenkit-react/styles.js").then((styles) => {
       injectStyles(styles.default);
     });
   }, []);
+
+  if (!mounted) {
+    return null;
+  }
 
   return (
     <WagmiProvider config={wagmiConfig}>

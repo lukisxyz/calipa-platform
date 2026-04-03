@@ -61,7 +61,7 @@ export function DashboardSidebar({ onMenuClick }: DashboardSidebarProps) {
         {onMenuClick && (
           <button
             onClick={onMenuClick}
-            className="p-1.5 -ml-1.5 rounded-md hover:bg-slate-100 lg:hidden"
+            className="p-1.5 -ml-1.5 rounded-md hover:bg-slate-100 sm:hidden"
           >
             <X className="size-5 text-slate-600" />
           </button>
